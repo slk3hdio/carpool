@@ -6,6 +6,28 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>同城拼车与实时路况系统</title>
     <script type="text/javascript" src="https://webapi.amap.com/maps?v=2.0&key=35b12f2cc34fbe5817c0eea4ea388e73"></script>
+<script src="/api-mock.js"></script>
+<script>
+  // 监听AMap加载完成
+  window.onAMapLoaded = function() {
+    console.log('AMap API加载完成');
+  }
+
+  // 检查AMap是否已加载
+  function checkAMapLoaded() {
+    if (window.AMap) {
+      console.log('AMap已就绪');
+      if (window.onAMapLoaded) {
+        window.onAMapLoaded();
+      }
+    } else {
+      setTimeout(checkAMapLoaded, 100);
+    }
+  }
+
+  // 页面加载完成后开始检查
+  document.addEventListener('DOMContentLoaded', checkAMapLoaded);
+</script>
   </head>
   <body>
     <div id="app"></div>

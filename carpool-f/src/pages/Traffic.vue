@@ -1,7 +1,7 @@
 <template>
   <div class="page">
     <h2>实时路况</h2>
-    <p>这里将来会集成地图与路况渲染。</p>
+    <p>用户可以查看当前路况。</p>
   </div>
 </template>
 

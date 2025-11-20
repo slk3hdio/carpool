@@ -8,7 +8,7 @@ const routes = [
   { path: '/', component: Home },
   { path: '/traffic', component: Traffic },
   { path: '/carpool', component: Carpool },
-  { path: '/user', component: User },
+  { path: '/user', component: User }
 ]
 
 export default createRouter({
