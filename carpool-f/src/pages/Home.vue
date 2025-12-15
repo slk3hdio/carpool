@@ -5,7 +5,7 @@
       <AMapContaioner />
 
       <!-- 浮动操作面板 -->
-      <!-- <div class="floating-panel">
+      <div class="floating-panel">
         <div class="panel-header">
           <h3 class="title">同城拼车与实时路况</h3>
         </div>
@@ -19,7 +19,7 @@
             实时路况
           </router-link>
         </div>
-      </div> -->
+      </div>
     </div>
 
     <CarpoolPanel v-model:visible="panelVisible" />
