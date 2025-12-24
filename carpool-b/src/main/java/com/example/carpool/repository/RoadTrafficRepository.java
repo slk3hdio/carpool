@@ -73,4 +73,70 @@ public interface RoadTrafficRepository extends JpaRepository<RoadTrafficOverall,
      * 检查道路是否存在
      */
     boolean existsByRoadNameAndCity(String roadName, String city);
+
+    // ========== 历史数据查询相关方法 ==========
+
+    /**
+     * 获取指定道路在指定时间范围内的历史数据
+     */
+    @Query("SELECT r FROM RoadTrafficOverall r WHERE " +
+           "r.roadName = :roadName AND r.city = :city AND " +
+           "r.requestTime BETWEEN :startTime AND :endTime " +
+           "ORDER BY r.requestTime DESC")
+    Page<RoadTrafficOverall> findHistoricalTraffic(
+            @Param("roadName") String roadName,
+            @Param("city") String city,
+            @Param("startTime") LocalDateTime startTime,
+            @Param("endTime") LocalDateTime endTime,
+            Pageable pageable);
+
+    /**
+     * 获取所有不重复的城市列表
+     */
+    @Query("SELECT DISTINCT r.city FROM RoadTrafficOverall r ORDER BY r.city")
+    List<String> findDistinctCities();
+
+    /**
+     * 获取指定城市的所有不重复道路列表
+     */
+    @Query("SELECT DISTINCT r.roadName FROM RoadTrafficOverall r WHERE r.city = :city ORDER BY r.roadName")
+    List<String> findDistinctRoadsByCity(@Param("city") String city);
+
+    /**
+     * 获取指定道路最新的平均速度
+     */
+    @Query("SELECT AVG(cs.speed) FROM CongestionSection cs WHERE cs.overallId IN " +
+           "(SELECT r.id FROM RoadTrafficOverall r WHERE r.roadName = :roadName AND r.city = :city " +
+           "AND r.requestTime BETWEEN :startTime AND :endTime) AND cs.speed IS NOT NULL")
+    Double getAverageSpeedByRoadAndTimeRange(
+            @Param("roadName") String roadName,
+            @Param("city") String city,
+            @Param("startTime") LocalDateTime startTime,
+            @Param("endTime") LocalDateTime endTime);
+
+    /**
+     * 获取指定道路在指定时间范围内的拥堵统计
+     */
+    @Query("SELECT r.evaluationStatus, COUNT(r) FROM RoadTrafficOverall r WHERE " +
+           "r.roadName = :roadName AND r.city = :city AND " +
+           "r.requestTime BETWEEN :startTime AND :endTime " +
+           "GROUP BY r.evaluationStatus")
+    List<Object[]> getCongestionStatsByRoadAndTimeRange(
+            @Param("roadName") String roadName,
+            @Param("city") String city,
+            @Param("startTime") LocalDateTime startTime,
+            @Param("endTime") LocalDateTime endTime);
+
+    /**
+     * 检查时间范围是否超过限制（防止查询过多数据）
+     */
+    @Query("SELECT COUNT(r) FROM RoadTrafficOverall r WHERE " +
+           "r.roadName = :roadName AND r.city = :city AND " +
+           "r.requestTime BETWEEN :startTime AND :endTime")
+    Long countHistoricalTraffic(
+            @Param("roadName") String roadName,
+            @Param("city") String city,
+            @Param("startTime") LocalDateTime startTime,
+            @Param("endTime") LocalDateTime endTime);
+
 }

@@ -8,9 +8,11 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @RestController
@@ -126,5 +128,51 @@ public class TrafficController {
         Pageable pageable = PageRequest.of(0, 10, Sort.by("requestTime").descending());
         Page<TrafficResponse> traffic = trafficService.getAllLatestTraffic(pageable);
         return ResponseEntity.ok(traffic.getContent());
+    }
+
+    // ========== 历史数据查询相关接口 ==========
+
+    /**
+     * 获取历史路况数据
+     */
+    @GetMapping("/historical")
+    public ResponseEntity<Page<TrafficResponse>> getHistoricalTraffic(
+            @RequestParam String roadName,
+            @RequestParam String city,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime startTime,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime endTime,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "100") int size) {
+
+        try {
+            Pageable pageable = PageRequest.of(page, size, Sort.by("requestTime").ascending());
+            Page<TrafficResponse> historicalData = trafficService.getHistoricalTraffic(
+                    roadName, city, startTime, endTime, pageable);
+            return ResponseEntity.ok(historicalData);
+        } catch (IllegalArgumentException e) {
+            throw new RuntimeException(e.getMessage()); // 会被全局异常处理器处理
+        }
+    }
+
+    /**
+     * 获取城市道路列表
+     */
+    @GetMapping("/cities/{city}/roads")
+    public ResponseEntity<List<String>> getRoadsByCity(@PathVariable String city) {
+        try {
+            List<String> roads = trafficService.getRoadsByCity(city);
+            return ResponseEntity.ok(roads);
+        } catch (IllegalArgumentException e) {
+            throw new RuntimeException(e.getMessage()); // 会被全局异常处理器处理
+        }
+    }
+
+    /**
+     * 获取支持的城市列表
+     */
+    @GetMapping("/cities")
+    public ResponseEntity<List<String>> getSupportedCities() {
+        List<String> cities = trafficService.getSupportedCities();
+        return ResponseEntity.ok(cities);
     }
 }

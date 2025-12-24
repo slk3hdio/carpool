@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -185,5 +186,179 @@ public class TrafficService {
             case 4: return "严重拥堵";
             default: return "未知";
         }
+    }
+
+    // ========== 历史数据查询相关方法 ==========
+
+    /**
+     * 获取指定道路在指定时间范围内的历史数据
+     */
+    public Page<TrafficResponse> getHistoricalTraffic(
+            String roadName, String city,
+            LocalDateTime startTime, LocalDateTime endTime,
+            Pageable pageable) {
+
+        // 参数验证
+        validateHistoricalQueryParams(roadName, city, startTime, endTime);
+
+        // 检查时间范围是否超过限制
+        long hoursBetween = ChronoUnit.HOURS.between(startTime, endTime);
+        if (hoursBetween > 30 * 24) { // 30天限制
+            throw new IllegalArgumentException("查询时间范围不能超过30天");
+        }
+
+        // 标准化城市名称用于查询
+        String normalizedCity = normalizeCityName(city.trim());
+        String trimmedRoadName = roadName.trim();
+
+        // 检查数据量是否过大（使用标准化的城市名称）
+        Long dataCount = roadTrafficRepository.countHistoricalTraffic(trimmedRoadName, normalizedCity, startTime, endTime);
+        if (dataCount > 5000) { // 单次查询最多5000条数据
+            throw new IllegalArgumentException("查询数据量过大，请缩小时间范围");
+        }
+
+        // 先尝试标准化的城市名称
+        Page<RoadTrafficOverall> trafficPage = roadTrafficRepository.findHistoricalTraffic(
+                trimmedRoadName, normalizedCity, startTime, endTime, pageable);
+
+        // 如果没有找到数据，尝试原始城市名称
+        if (trafficPage.getContent().isEmpty()) {
+            trafficPage = roadTrafficRepository.findHistoricalTraffic(
+                    trimmedRoadName, city.trim(), startTime, endTime, pageable);
+        }
+
+        // 为每条历史数据补充速度信息
+        List<TrafficResponse> responses = trafficPage.getContent().stream()
+                .map(traffic -> {
+                    TrafficResponse response = convertToTrafficResponse(traffic);
+                    // 获取该时间点的平均速度
+                    Double avgSpeed = getAverageSpeedForTraffic(traffic);
+                    if (avgSpeed != null) {
+                        response.setSpeed(avgSpeed);
+                    }
+                    // 获取拥堵距离
+                    Integer congestionDistance = getCongestionDistanceForTraffic(traffic);
+                    if (congestionDistance != null) {
+                        response.setCongestionDistance(congestionDistance);
+                    }
+                    return response;
+                })
+                .collect(Collectors.toList());
+
+        return new PageImpl<>(responses, trafficPage.getPageable(), trafficPage.getTotalElements());
+    }
+
+    /**
+     * 获取所有支持的城市列表
+     */
+    public List<String> getSupportedCities() {
+        return roadTrafficRepository.findDistinctCities();
+    }
+
+    /**
+     * 获取指定城市的所有道路列表
+     */
+    public List<String> getRoadsByCity(String city) {
+        if (city == null || city.trim().isEmpty()) {
+            throw new IllegalArgumentException("城市名称不能为空");
+        }
+
+        // 尝试标准化的城市名称（移除"市"后缀）
+        String normalizedCity = normalizeCityName(city.trim());
+        List<String> roads = roadTrafficRepository.findDistinctRoadsByCity(normalizedCity);
+
+        // 如果没有找到，尝试原始城市名称
+        if (roads.isEmpty()) {
+            roads = roadTrafficRepository.findDistinctRoadsByCity(city.trim());
+        }
+
+        if (roads.isEmpty()) {
+            throw new IllegalArgumentException("城市 '" + city + "' 暂无数据或城市名称错误");
+        }
+        return roads;
+    }
+
+    /**
+     * 验证历史数据查询参数
+     */
+    private void validateHistoricalQueryParams(String roadName, String city, LocalDateTime startTime, LocalDateTime endTime) {
+        if (roadName == null || roadName.trim().isEmpty()) {
+            throw new IllegalArgumentException("道路名称不能为空");
+        }
+        if (city == null || city.trim().isEmpty()) {
+            throw new IllegalArgumentException("城市名称不能为空");
+        }
+        if (startTime == null) {
+            throw new IllegalArgumentException("开始时间不能为空");
+        }
+        if (endTime == null) {
+            throw new IllegalArgumentException("结束时间不能为空");
+        }
+        if (startTime.isAfter(endTime)) {
+            throw new IllegalArgumentException("开始时间必须早于结束时间");
+        }
+        if (endTime.isAfter(LocalDateTime.now().plusMinutes(5))) {
+            throw new IllegalArgumentException("结束时间不能超过当前时间");
+        }
+
+        // 标准化城市名称（移除"市"后缀）
+        String normalizedCity = normalizeCityName(city.trim());
+        String trimmedRoadName = roadName.trim();
+
+        // 检查道路是否存在
+        if (!roadTrafficRepository.existsByRoadNameAndCity(trimmedRoadName, normalizedCity)) {
+            // 尝试原始城市名称
+            if (!roadTrafficRepository.existsByRoadNameAndCity(trimmedRoadName, city.trim())) {
+                throw new IllegalArgumentException("道路 '" + roadName + "' 在城市 '" + city + "' 中不存在");
+            }
+        }
+    }
+
+    /**
+     * 标准化城市名称，移除常见的后缀
+     */
+    private String normalizeCityName(String cityName) {
+        if (cityName == null) return null;
+
+        // 移除常见的城市后缀
+        if (cityName.endsWith("市")) {
+            return cityName.substring(0, cityName.length() - 1);
+        }
+        if (cityName.endsWith("自治区")) {
+            return cityName.substring(0, cityName.length() - 3);
+        }
+        if (cityName.endsWith("自治州")) {
+            return cityName.substring(0, cityName.length() - 3);
+        }
+        if (cityName.endsWith("地区")) {
+            return cityName.substring(0, cityName.length() - 2);
+        }
+
+        return cityName;
+    }
+
+    /**
+     * 获取指定路况记录的平均速度
+     */
+    private Double getAverageSpeedForTraffic(RoadTrafficOverall traffic) {
+        List<CongestionSection> sections = congestionSectionRepository.findByOverallIdOrderByCreatedAtDesc(traffic.getId());
+        if (sections.isEmpty()) {
+            return null;
+        }
+
+        java.util.OptionalDouble avgSpeed = sections.stream()
+                .filter(section -> section.getSpeed() != null)
+                .mapToDouble(section -> section.getSpeed().doubleValue())
+                .average();
+
+        return avgSpeed.isPresent() ? avgSpeed.getAsDouble() : null;
+    }
+
+    /**
+     * 获取指定路况记录的拥堵距离
+     */
+    private Integer getCongestionDistanceForTraffic(RoadTrafficOverall traffic) {
+        Integer totalDistance = congestionSectionRepository.getTotalCongestionDistance(traffic.getId());
+        return (totalDistance != null && totalDistance > 0) ? totalDistance / 1000 : null; // 转换为公里
     }
 }

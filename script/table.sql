@@ -31,3 +31,4 @@ CREATE TABLE congestion_sections (
 CREATE INDEX idx_road_city ON road_traffic_overall(road_name, city);
 CREATE INDEX idx_request_time ON road_traffic_overall(request_time);
 CREATE INDEX idx_overall_id ON congestion_sections(overall_id);
+
