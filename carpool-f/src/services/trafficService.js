@@ -6,6 +6,10 @@ const api = axios.create({
   timeout: 10000,
   headers: {
     'Content-Type': 'application/json'
+  },
+  // 允许 axios 正确处理 URL 中的特殊字符
+  paramsSerializer: {
+    indexes: null
   }
 })
 
@@ -290,7 +294,9 @@ const trafficService = {
     }
 
     try {
-      const response = await api.get(`/traffic/cities/${city}/roads`)
+      // 使用 encodeURIComponent 确保中文正确编码
+      const encodedCity = encodeURIComponent(city)
+      const response = await api.get(`/traffic/cities/${encodedCity}/roads`)
       return response || []
     } catch (error) {
       console.error(`获取${city}道路列表失败:`, error)

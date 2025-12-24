@@ -129,13 +129,28 @@
 </template>
 
 <script>
-import { ref, reactive, computed, watch, onMounted } from 'vue'
+import { ref, reactive, computed, onMounted } from 'vue'
 import VChart from 'vue-echarts'
-import 'echarts/lib/chart/line'
-import 'echarts/lib/component/tooltip'
-import 'echarts/lib/component/legend'
-import 'echarts/lib/component/grid'
+import { use } from 'echarts/core'
+import { CanvasRenderer } from 'echarts/renderers'
+import { LineChart } from 'echarts/charts'
+import {
+  TitleComponent,
+  TooltipComponent,
+  LegendComponent,
+  GridComponent
+} from 'echarts/components'
 import trafficService from '../services/trafficService.js'
+
+// 注册必需的组件
+use([
+  CanvasRenderer,
+  LineChart,
+  TitleComponent,
+  TooltipComponent,
+  LegendComponent,
+  GridComponent
+])
 
 export default {
   name: 'HistoricalTrafficCard',
@@ -197,14 +212,17 @@ export default {
     // 计算属性
     const averageCongestion = computed(() => {
       if (historicalData.value.length === 0) return 0
-      const sum = historicalData.value.reduce((acc, item) => acc + item.evaluation_status, 0)
+      const sum = historicalData.value.reduce((acc, item) => {
+        const status = item.evaluationStatus || item.evaluation_status || 0
+        return acc + status
+      }, 0)
       return sum / historicalData.value.length
     })
 
     const congestionPercentage = computed(() => {
       if (historicalData.value.length === 0) return 0
       const congestedCount = historicalData.value.filter(
-        item => item.evaluation_status >= 2
+        item => (item.evaluationStatus || item.evaluation_status || 0) >= 2
       ).length
       return Math.round((congestedCount / historicalData.value.length) * 100)
     })
@@ -212,7 +230,7 @@ export default {
     const averageSpeed = computed(() => {
       const speedData = historicalData.value.filter(item => item.speed)
       if (speedData.length === 0) return 0
-      const sum = speedData.reduce((acc, item) => acc + item.speed, 0)
+      const sum = speedData.reduce((acc, item) => acc + (item.speed || 0), 0)
       return Math.round(sum / speedData.length)
     })
 
@@ -220,16 +238,37 @@ export default {
     const chartOption = computed(() => {
       if (historicalData.value.length === 0) return {}
 
-      const timeData = historicalData.value.map(item =>
-        new Date(item.request_time).toLocaleString('zh-CN', {
-          month: '2-digit',
-          day: '2-digit',
-          hour: '2-digit',
-          minute: '2-digit'
-        })
-      )
+      // 解析时间数据 - 处理后端返回的 requestTime 字段
+      const timeData = historicalData.value.map(item => {
+        try {
+          // 后端返回格式: "2025-12-24 16:18:34" 或 "2025-12-24T16:18:34"
+          const timeStr = item.requestTime || item.request_time
+          if (!timeStr) return '未知时间'
 
-      const statusData = historicalData.value.map(item => item.evaluation_status)
+          // 替换空格为T，确保标准ISO格式
+          const normalizedTimeStr = timeStr.replace(' ', 'T')
+          const date = new Date(normalizedTimeStr)
+
+          // 检查日期是否有效
+          if (isNaN(date.getTime())) {
+            console.warn('Invalid date:', timeStr, item)
+            return timeStr // 如果解析失败，直接显示原始字符串
+          }
+
+          return date.toLocaleString('zh-CN', {
+            month: '2-digit',
+            day: '2-digit',
+            hour: '2-digit',
+            minute: '2-digit'
+          })
+        } catch (err) {
+          console.error('Error parsing date:', err, item)
+          return '时间错误'
+        }
+      })
+
+      // 获取状态数据 - 兼容驼峰和下划线命名
+      const statusData = historicalData.value.map(item => item.evaluationStatus || item.evaluation_status || 0)
       const speedData = historicalData.value.map(item => item.speed || null)
 
       return {
@@ -385,11 +424,18 @@ export default {
         const cities = await trafficService.getSupportedCities()
         availableCities.value = cities
         console.log('获取城市列表成功:', cities)
+
+        // 如果当前没有选中城市，或者选中的城市不在列表中，则默认选择第一个城市
+        if (cities.length > 0 && (!selectedCity.value || !cities.includes(selectedCity.value))) {
+          selectedCity.value = cities[0]
+          // 自动加载该城市的道路列表
+          await fetchRoadsForCity()
+        }
       } catch (err) {
         console.error('获取城市列表失败:', err)
         availableCities.value = []
         // 如果API失败，提供一些默认的城市选项
-        availableCities.value = ['上海', '北京', '广州', '深圳', '杭州', '成都', '南京', '武汉']
+        availableCities.value = ['上海市', '北京市', '广州市', '深圳市', '杭州市', '成都市', '南京市', '武汉市']
       }
     }
 
@@ -457,22 +503,10 @@ export default {
       }
     }
 
-    // 监听器
-    watch([selectedRoad, selectedCity], () => {
-      if (selectedRoad.value && selectedCity.value) {
-        fetchHistoricalData()
-      }
-    })
-
     // 生命周期
     onMounted(async () => {
-      // 先获取城市列表
+      // 获取城市列表，会自动选择第一个城市并加载道路列表
       await fetchCities()
-
-      // 如果有初始城市，获取该城市的道路列表
-      if (props.initialCity) {
-        fetchRoadsForCity()
-      }
     })
 
     return {

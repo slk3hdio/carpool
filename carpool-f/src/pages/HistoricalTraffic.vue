@@ -64,7 +64,7 @@ export default {
   },
   setup() {
     // 可以从URL参数或路由获取初始值
-    const initialCity = ref('北京')
+    const initialCity = ref('') // 留空，让组件自动选择第一个可用城市
     const initialRoad = ref('')
     const defaultTimeRange = ref('1h')
 
