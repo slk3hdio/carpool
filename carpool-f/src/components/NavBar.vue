@@ -4,6 +4,7 @@
     <div class="menu" :class="{ 'mobile-open': mobileMenuOpen }">
       <router-link to="/" @click="closeMobileMenu">首页</router-link>
       <router-link to="/traffic" @click="closeMobileMenu">实时路况</router-link>
+      <router-link to="/historical" @click="closeMobileMenu">历史分析</router-link>
       <router-link to="/carpool" @click="closeMobileMenu">同城拼车</router-link>
       <!-- <router-link to="/demo" @click="closeMobileMenu">路况演示</router-link> -->
       <router-link to="/user" @click="closeMobileMenu">用户中心</router-link>

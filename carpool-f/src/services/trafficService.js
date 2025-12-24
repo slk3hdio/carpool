@@ -100,7 +100,7 @@ const trafficService = {
     } = params
 
     try {
-      const response = await api.get(`/traffic/city/${encodeURIComponent(city)}`, {
+      const response = await api.get(`/traffic/city/${city}`, {
         params: { page, size }
       })
       return response
@@ -125,7 +125,7 @@ const trafficService = {
 
     try {
       const response = await api.get(
-        `/traffic/road/${encodeURIComponent(roadName)}/city/${encodeURIComponent(city)}`,
+        `/traffic/road/${roadName}/city/${city}`,
         { params: { page, size } }
       )
       return response
@@ -228,6 +228,86 @@ const trafficService = {
       return response
     } catch (error) {
       console.error('获取热门道路路况失败:', error)
+      throw error
+    }
+  },
+
+  /**
+   * 获取历史路况数据
+   * @param {Object} params 查询参数
+   * @param {string} params.roadName 道路名称
+   * @param {string} params.city 城市名称
+   * @param {string} params.startTime 开始时间 (ISO string)
+   * @param {string} params.endTime 结束时间 (ISO string)
+   * @param {number} params.page 页码，默认0
+   * @param {number} params.size 每页大小，默认100
+   * @returns {Promise} 历史路况数据
+   */
+  async getHistoricalTraffic(params = {}) {
+    const {
+      roadName,
+      city,
+      startTime,
+      endTime,
+      page = 0,
+      size = 100
+    } = params
+
+    if (!roadName || !city) {
+      throw new Error('道路名称和城市名称不能为空')
+    }
+
+    if (!startTime || !endTime) {
+      throw new Error('开始时间和结束时间不能为空')
+    }
+
+    try {
+      const response = await api.get('/traffic/historical', {
+        params: {
+          roadName,
+          city,
+          startTime,
+          endTime,
+          page,
+          size
+        }
+      })
+      return response.content || response
+    } catch (error) {
+      console.error(`获取历史路况数据失败 (${roadName}, ${city}):`, error)
+      throw error
+    }
+  },
+
+  /**
+   * 获取城市道路列表
+   * @param {string} city 城市名称
+   * @returns {Promise} 道路列表
+   */
+  async getRoadsByCity(city) {
+    if (!city) {
+      throw new Error('城市名称不能为空')
+    }
+
+    try {
+      const response = await api.get(`/traffic/cities/${city}/roads`)
+      return response || []
+    } catch (error) {
+      console.error(`获取${city}道路列表失败:`, error)
+      throw error
+    }
+  },
+
+  /**
+   * 获取支持的城市列表
+   * @returns {Promise} 城市列表
+   */
+  async getSupportedCities() {
+    try {
+      const response = await api.get('/traffic/cities')
+      return response || []
+    } catch (error) {
+      console.error('获取支持的城市列表失败:', error)
       throw error
     }
   },

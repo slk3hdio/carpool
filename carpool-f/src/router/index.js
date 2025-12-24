@@ -4,13 +4,15 @@ import Traffic from '../pages/Traffic.vue'
 import Carpool from '../pages/Carpool.vue'
 import User from '../pages/User.vue'
 import RoadDemo from '../pages/RoadDemo.vue'
+import HistoricalTraffic from '../pages/HistoricalTraffic.vue'
 
 const routes = [
   { path: '/', component: Home },
   { path: '/traffic', component: Traffic },
   { path: '/carpool', component: Carpool },
   { path: '/user', component: User },
-  { path: '/demo', component: RoadDemo }
+  { path: '/demo', component: RoadDemo },
+  { path: '/historical', component: HistoricalTraffic }
 ]
 
 export default createRouter({
