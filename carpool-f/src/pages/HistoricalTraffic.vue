@@ -17,7 +17,7 @@
     </div>
 
     <!-- 使用说明 -->
-    <div class="usage-tips">
+    <!-- <div class="usage-tips">
       <h3>使用说明</h3>
       <div class="tips-grid">
         <div class="tip-item">
@@ -49,7 +49,7 @@
           </div>
         </div>
       </div>
-    </div>
+    </div> -->
   </div>
 </template>
 

@@ -21,19 +21,19 @@ public class CarpoolRequest {
     @Column(name = "start_location", nullable = false, length = 255)
     private String startLocation;
 
-    @Column(name = "start_latitude", precision = 10, scale = 7)
+    @Column(name = "start_latitude")
     private Double startLatitude;
 
-    @Column(name = "start_longitude", precision = 10, scale = 7)
+    @Column(name = "start_longitude")
     private Double startLongitude;
 
     @Column(name = "end_location", nullable = false, length = 255)
     private String endLocation;
 
-    @Column(name = "end_latitude", precision = 10, scale = 7)
+    @Column(name = "end_latitude")
     private Double endLatitude;
 
-    @Column(name = "end_longitude", precision = 10, scale = 7)
+    @Column(name = "end_longitude")
     private Double endLongitude;
 
     @Column(name = "earliest_departure_time", nullable = false)
