@@ -169,7 +169,7 @@ if __name__ == "__main__":
     db_config = {
         'host': 'localhost',
         'user': 'root',
-        'password': '114514',
+        'password': 'Lsp20041225',
         'database': 'carpool'
     }
     
