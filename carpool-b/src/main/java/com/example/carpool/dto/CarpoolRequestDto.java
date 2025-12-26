@@ -5,7 +5,9 @@ import java.time.LocalDateTime;
 
 public class CarpoolRequestDto {
 
+    private Long userId;
     private Boolean hasCar;
+    private Integer maxPassengerCount;
     private Integer passengerCount;
     private String startLocation;
     private Double startLatitude;
@@ -25,12 +27,28 @@ public class CarpoolRequestDto {
 
     public CarpoolRequestDto() {}
 
+    public Long getUserId() {
+        return userId;
+    }
+
+    public void setUserId(Long userId) {
+        this.userId = userId;
+    }
+
     public Boolean getHasCar() {
         return hasCar;
     }
 
     public void setHasCar(Boolean hasCar) {
         this.hasCar = hasCar;
+    }
+
+    public Integer getMaxPassengerCount() {
+        return maxPassengerCount;
+    }
+
+    public void setMaxPassengerCount(Integer maxPassengerCount) {
+        this.maxPassengerCount = maxPassengerCount;
     }
 
     public Integer getPassengerCount() {

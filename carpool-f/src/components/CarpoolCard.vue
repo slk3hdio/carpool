@@ -11,7 +11,7 @@
             乘客人数: {{ request.passengerCount }}人
           </div>
           <div class="seat-info" v-else>
-            可载{{ request.passengerCount }}人
+            可载{{ request.maxPassengerCount - request.passengerCount }}人
           </div>
         </div>
       </div>

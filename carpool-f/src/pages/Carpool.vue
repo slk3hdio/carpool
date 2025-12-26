@@ -1,8 +1,8 @@
 <template>
   <div class="carpool-page">
     <div class="page-header">
-      <h2>同城拼车</h2>
-      <p>寻找附近的拼车伙伴,共享出行,节约成本</p>
+      <h1 class="page-title">同城拼车</h1>
+      <p class="page-subtitle">寻找附近的拼车伙伴,共享出行,节约成本</p>
     </div>
 
     <!-- 筛选器 -->
@@ -108,6 +108,7 @@
 
 <script>
 import CarpoolCardGrid from '@/components/CarpoolCardGrid.vue'
+import trafficService from '@/services/trafficService'
 
 export default {
   name: 'Carpool',
@@ -186,12 +187,9 @@ export default {
     async loadCarpoolRequests() {
       this.loading = true
       try {
-        // TODO: 替换为实际的API调用
-        // const response = await this.$http.get('/api/carpool/requests')
-        // this.requests = response.data
-
-        // 模拟数据用于演示
-        this.requests = this.getMockData()
+        // 调用实际的API获取拼车需求
+        const response = await trafficService.getCarpoolRequests(this.filters)
+        this.requests = response
       } catch (error) {
         console.error('加载拼车需求失败:', error)
         this.$message?.error('加载拼车需求失败,请稍后重试')
@@ -200,79 +198,9 @@ export default {
       }
     },
 
-    getMockData() {
-      return [
-        {
-          id: 1,
-          hasCar: true,
-          passengerCount: 3,
-          startLocation: '上海浦东国际机场',
-          endLocation: '上海虹桥火车站',
-          earliestDepartureTime: '2025-12-26T08:00:00',
-          latestDepartureTime: '2025-12-26T10:00:00',
-          phoneNumber: '13812345678',
-          statusDesc: '等待匹配'
-        },
-        {
-          id: 2,
-          hasCar: false,
-          passengerCount: 2,
-          startLocation: '上海人民广场',
-          endLocation: '上海迪士尼度假区',
-          earliestDepartureTime: '2025-12-26T09:00:00',
-          latestDepartureTime: '2025-12-26T11:00:00',
-          phoneNumber: '13987654321',
-          statusDesc: '等待匹配'
-        },
-        {
-          id: 3,
-          hasCar: true,
-          passengerCount: 4,
-          startLocation: '上海南站',
-          endLocation: '上海东方明珠',
-          earliestDepartureTime: '2025-12-26T14:00:00',
-          latestDepartureTime: '2025-12-26T16:00:00',
-          phoneNumber: '13666666666',
-          statusDesc: '已匹配'
-        },
-        {
-          id: 4,
-          hasCar: false,
-          passengerCount: 1,
-          startLocation: '复旦大学',
-          endLocation: '上海科技大学',
-          earliestDepartureTime: '2025-12-27T07:30:00',
-          latestDepartureTime: '2025-12-27T09:00:00',
-          phoneNumber: '13555555555',
-          statusDesc: '等待匹配'
-        },
-        {
-          id: 5,
-          hasCar: true,
-          passengerCount: 2,
-          startLocation: '上海火车站',
-          endLocation: '上海交通大学',
-          earliestDepartureTime: '2025-12-27T08:00:00',
-          latestDepartureTime: '2025-12-27T10:00:00',
-          phoneNumber: '13777777777',
-          statusDesc: '等待匹配'
-        },
-        {
-          id: 6,
-          hasCar: false,
-          passengerCount: 3,
-          startLocation: '静安寺',
-          endLocation: '外滩',
-          earliestDepartureTime: '2025-12-26T19:00:00',
-          latestDepartureTime: '2025-12-26T21:00:00',
-          phoneNumber: '13333333333',
-          statusDesc: '已完成'
-        }
-      ]
-    },
-
     handleFilterChange() {
-      // 筛选条件变化时自动触发计算属性更新
+      // 筛选条件变化时重新调用API获取数据
+      this.loadCarpoolRequests()
     },
 
     resetFilters() {
@@ -284,10 +212,15 @@ export default {
       }
     },
 
-    handleContact(request) {
-      console.log('联系车主:', request)
-      // TODO: 实现联系功能
-      this.$message?.success(`正在联系: ${request.phoneNumber}`)
+    async handleContact(request) {
+      try {
+        // 调用实际的API联系拼车用户
+        await trafficService.contactCarpoolUser(request.id, { phoneNumber: request.phoneNumber })
+        this.$message?.success(`正在联系: ${request.phoneNumber}`)
+      } catch (error) {
+        console.error('联系拼车用户失败:', error)
+        this.$message?.error('联系拼车用户失败,请稍后重试')
+      }
     }
   }
 }
@@ -295,28 +228,35 @@ export default {
 
 <style scoped>
 .carpool-page {
-  padding: 40px;
-  max-width: 1400px;
-  margin: 0 auto;
+  min-height: 100vh;
+  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+  padding: 80px 0 40px;
 }
 
 /* 页面头部 */
 .page-header {
   text-align: center;
-  margin-bottom: 40px;
+  max-width: 800px;
+  margin: 0 auto 40px;
+  padding: 0 20px;
 }
 
-.page-header h2 {
-  font-size: 2rem;
-  color: #2c3e50;
-  margin: 0 0 12px 0;
+ .page-title {
+  font-size: 2.5rem;
   font-weight: 700;
+  color: #2c3e50;
+  margin: 0 0 16px 0;
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
 }
 
-.page-header p {
-  font-size: 1rem;
-  color: #7f8c8d;
+.page-subtitle {
+  font-size: 1.2rem;
+  color: #666;
   margin: 0;
+  line-height: 1.6;
 }
 
 /* 筛选器区域 */

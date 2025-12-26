@@ -352,6 +352,54 @@ const trafficService = {
       4: 'congestion-4'
     }
     return classMap[status] || 'congestion-0'
+  },
+
+  /**
+   * 获取拼车需求列表
+   * @param {Object} params 查询参数
+   * @param {string} params.startLocation 出发地
+   * @param {string} params.endLocation 目的地
+   * @param {boolean} params.hasCar 是否有车
+   * @param {string} params.status 状态
+   * @param {number} params.page 页码，默认0
+   * @param {number} params.size 每页大小，默认20
+   * @returns {Promise} 拼车需求列表
+   */
+  async getCarpoolRequests(params = {}) {
+    const {
+      startLocation = '',
+      endLocation = '',
+      hasCar = null,
+      status = '',
+      page = 0,
+      size = 20
+    } = params
+
+    try {
+      const response = await api.get('/carpool/requests', {
+        params: { startLocation, endLocation, hasCar, status, page, size }
+      })
+      return response
+    } catch (error) {
+      console.error('获取拼车需求列表失败:', error)
+      throw error
+    }
+  },
+
+  /**
+   * 联系拼车用户
+   * @param {number} requestId 拼车需求ID
+   * @param {Object} contactInfo 联系信息
+   * @returns {Promise} 联系结果
+   */
+  async contactCarpoolUser(requestId, contactInfo = {}) {
+    try {
+      const response = await api.post(`/carpool/requests/${requestId}/contact`, contactInfo)
+      return response
+    } catch (error) {
+      console.error(`联系拼车用户失败 (ID: ${requestId}):`, error)
+      throw error
+    }
   }
 }
 

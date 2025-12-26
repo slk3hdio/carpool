@@ -1,7 +1,9 @@
 CREATE TABLE carpool_request (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    user_id BIGINT NOT NULL COMMENT '用户ID',
     has_car BOOLEAN NOT NULL COMMENT '是否有车',
     passenger_count INT NOT NULL COMMENT '乘客数量',
+    max_passenger_count INT NOT NULL COMMENT '最大乘客数量',
     start_location VARCHAR(255) NOT NULL COMMENT '起点位置',
     start_latitude DECIMAL(10, 7) COMMENT '起点纬度',
     start_longitude DECIMAL(10, 7) COMMENT '起点经度',
@@ -18,9 +20,10 @@ CREATE TABLE carpool_request (
 CREATE TABLE match_record (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
     request_id BIGINT NOT NULL COMMENT '请求ID',
+    user_id BIGINT NOT NULL COMMENT '用户ID',
     trip_id BIGINT NOT NULL COMMENT '行程ID',
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP COMMENT '匹配时间',
-)
+);
 
 CREATE TABLE trip_record (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
@@ -36,6 +39,6 @@ CREATE TABLE trip_record (
 
     match_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP COMMENT '匹配时间',
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-)
+);
 
 

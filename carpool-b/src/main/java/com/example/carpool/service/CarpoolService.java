@@ -19,7 +19,9 @@ public class CarpoolService {
     @Transactional
     public CarpoolRequest createCarpoolRequest(CarpoolRequestDto dto) {
         CarpoolRequest request = new CarpoolRequest();
+        request.setUserId(dto.getUserId());
         request.setHasCar(dto.getHasCar());
+        request.setMaxPassengerCount(dto.getMaxPassengerCount());
         request.setPassengerCount(dto.getPassengerCount());
         request.setStartLocation(dto.getStartLocation());
         request.setStartLatitude(dto.getStartLatitude());

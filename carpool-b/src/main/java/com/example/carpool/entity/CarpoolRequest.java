@@ -12,8 +12,14 @@ public class CarpoolRequest {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(name = "user_id", nullable = false)
+    private Long userId;
+
     @Column(name = "has_car", nullable = false)
     private Boolean hasCar;
+
+    @Column(name = "max_passenger_count", nullable = false)
+    private Integer maxPassengerCount;
 
     @Column(name = "passenger_count", nullable = false)
     private Integer passengerCount;
@@ -65,8 +71,12 @@ public class CarpoolRequest {
         return id;
     }
 
-    public void setId(Long id) {
-        this.id = id;
+    public Long getUserId() {
+        return userId;
+    }
+
+    public void setUserId(Long userId) {
+        this.userId = userId;
     }
 
     public Boolean getHasCar() {
@@ -75,6 +85,14 @@ public class CarpoolRequest {
 
     public void setHasCar(Boolean hasCar) {
         this.hasCar = hasCar;
+    }
+
+    public Integer getMaxPassengerCount() {
+        return maxPassengerCount;
+    }
+
+    public void setMaxPassengerCount(Integer maxPassengerCount) {
+        this.maxPassengerCount = maxPassengerCount;
     }
 
     public Integer getPassengerCount() {
