@@ -55,3 +55,20 @@ CREATE TABLE users (
     INDEX idx_username (username),
     INDEX idx_phone (phone_number)
 ) COMMENT='用户表';
+
+-- 拼车邀请表
+CREATE TABLE carpool_invitation (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY COMMENT '邀请ID',
+    inviter_id BIGINT NOT NULL COMMENT '发起者ID（用户ID）',
+    carpool_request_id BIGINT NOT NULL COMMENT '对应的拼车需求ID',
+    passenger_count INT NOT NULL COMMENT '发起者人数',
+    message VARCHAR(255) COMMENT '留言备注',
+    status INT NOT NULL DEFAULT 1 COMMENT '邀请状态：1-待处理，2-已接受，3-已拒绝，4-已取消',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+    FOREIGN KEY (inviter_id) REFERENCES users(id) ON DELETE CASCADE,
+    FOREIGN KEY (carpool_request_id) REFERENCES carpool_request(id) ON DELETE CASCADE,
+    INDEX idx_inviter (inviter_id),
+    INDEX idx_request (carpool_request_id),
+    INDEX idx_status (status)
+) COMMENT='拼车邀请表';

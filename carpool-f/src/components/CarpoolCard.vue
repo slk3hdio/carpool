@@ -63,9 +63,14 @@
         <span class="contact-icon">📞</span>
         <span class="contact-phone">{{ maskPhone(request.phoneNumber) }}</span>
       </div>
-      <button class="action-btn" @click="handleContact">
-        联系车主
-      </button>
+      <div class="action-buttons">
+        <button class="action-btn invite-btn" @click="handleInvite">
+          发起邀请
+        </button>
+        <button class="action-btn contact-btn" @click="handleContact">
+          联系车主
+        </button>
+      </div>
     </div>
   </div>
 </template>
@@ -117,6 +122,10 @@ export default {
 
     handleContact() {
       this.$emit('contact', this.request)
+    },
+
+    handleInvite() {
+      this.$emit('invite', this.request)
     }
   }
 }
@@ -353,12 +362,16 @@ export default {
   align-items: center;
   border-top: 1px solid #eee;
   padding-top: 16px;
+  flex-wrap: wrap;
+  gap: 12px;
 }
 
 .contact-info {
   display: flex;
   align-items: center;
   gap: 8px;
+  flex: 1;
+  min-width: 120px;
 }
 
 .contact-icon {
@@ -371,19 +384,38 @@ export default {
   font-weight: 500;
 }
 
+.action-buttons {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
 .action-btn {
-  background: linear-gradient(135deg, #667eea, #764ba2);
   color: white;
   border: none;
-  padding: 10px 20px;
+  padding: 8px 16px;
   border-radius: 20px;
-  font-size: 0.9rem;
+  font-size: 0.85rem;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.3s ease;
+  white-space: nowrap;
 }
 
-.action-btn:hover {
+.invite-btn {
+  background: linear-gradient(135deg, #FF6B6B, #FF8E53);
+}
+
+.invite-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(255, 107, 107, 0.4);
+}
+
+.contact-btn {
+  background: linear-gradient(135deg, #667eea, #764ba2);
+}
+
+.contact-btn:hover {
   transform: translateY(-2px);
   box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
 }

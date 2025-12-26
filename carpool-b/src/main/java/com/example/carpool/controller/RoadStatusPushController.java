@@ -5,7 +5,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api/push/road-status")
+@RequestMapping("/push/road-status")
 public class RoadStatusPushController {
     @PostMapping
     public ResponseEntity<String> pushRoadStatus(@RequestBody String message) {

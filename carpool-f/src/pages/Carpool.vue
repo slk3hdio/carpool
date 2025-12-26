@@ -106,6 +106,7 @@
       :requests="filteredRequests"
       :loading="loading"
       @contact="handleContact"
+      @invite="handleInvite"
     />
 
     <!-- 发布拼车面板 -->
@@ -113,25 +114,36 @@
       v-model:visible="showPanel"
       @submitted="handlePublishSuccess"
     />
+
+    <!-- 发起邀请面板 -->
+    <InvitationPanel
+      v-model:visible="showInvitationPanel"
+      :carpool-request="selectedRequest"
+      @submitted="handleInvitationSuccess"
+    />
   </div>
 </template>
 
 <script>
 import CarpoolCardGrid from '@/components/CarpoolCardGrid.vue'
 import CarpoolPanel from '@/components/CarpoolPanel.vue'
+import InvitationPanel from '@/components/InvitationPanel.vue'
 import trafficService from '@/services/trafficService'
 
 export default {
   name: 'Carpool',
   components: {
     CarpoolCardGrid,
-    CarpoolPanel
+    CarpoolPanel,
+    InvitationPanel
   },
   data() {
     return {
       loading: false,
       requests: [],
       showPanel: false,
+      showInvitationPanel: false,
+      selectedRequest: null,
       filters: {
         startLocation: '',
         endLocation: '',
@@ -243,6 +255,17 @@ export default {
     handlePublishSuccess() {
       // 刷新拼车列表
       this.loadCarpoolRequests()
+    },
+
+    handleInvite(request) {
+      this.selectedRequest = request
+      this.showInvitationPanel = true
+    },
+
+    handleInvitationSuccess(data) {
+      console.log('邀请发送成功:', data)
+      this.$message?.success('邀请发送成功')
+      // 可选：刷新列表或更新状态
     }
   }
 }

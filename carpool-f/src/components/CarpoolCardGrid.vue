@@ -17,6 +17,7 @@
         :key="request.id"
         :request="request"
         @contact="handleContact"
+        @invite="handleInvite"
       />
     </div>
   </div>
@@ -43,6 +44,10 @@ export default {
   methods: {
     handleContact(request) {
       this.$emit('contact', request)
+    },
+
+    handleInvite(request) {
+      this.$emit('invite', request)
     }
   }
 }
