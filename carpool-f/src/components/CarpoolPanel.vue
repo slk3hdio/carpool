@@ -117,6 +117,7 @@
 <script setup>
 import { ref, computed } from 'vue';
 import axios from 'axios';
+import { useUserStore } from '../stores/user';
 
 const props = defineProps({
   visible: {
@@ -126,9 +127,10 @@ const props = defineProps({
 });
 
 const emit = defineEmits(['update:visible', 'submitted']);
+const userStore = useUserStore();
 
 const form = ref({
-  userId: 1, // 默认用户ID，实际应从登录状态获取
+  userId: userStore.userId || null, // 从登录状态获取用户ID
   hasCar: true,
   maxPassengerCount: 4,
   passengerCount: 1,
@@ -157,10 +159,13 @@ const toggle = () => {
 // 提交表单
 const submitForm = async () => {
   // 表单验证
-  if (!form.value.userId) {
-    alert('请输入用户ID');
+  if (!userStore.userId) {
+    alert('请先登录');
     return;
   }
+
+  // 更新userId为当前登录用户ID
+  form.value.userId = userStore.userId;
 
   if (!form.value.startLocation || !form.value.endLocation) {
     alert('请填写起点和终点');

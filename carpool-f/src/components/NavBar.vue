@@ -8,6 +8,18 @@
       <router-link to="/carpool" @click="closeMobileMenu">同城拼车</router-link>
       <!-- <router-link to="/demo" @click="closeMobileMenu">路况演示</router-link> -->
       <router-link to="/user" @click="closeMobileMenu">用户中心</router-link>
+
+      <!-- 登录/登出按钮 -->
+      <div class="auth-section">
+        <template v-if="userStore.isAuthenticated">
+          <span class="welcome-text">欢迎, {{ userStore.username }}</span>
+          <button class="auth-btn logout-btn" @click="handleLogout">登出</button>
+        </template>
+        <template v-else>
+          <router-link to="/login" @click="closeMobileMenu" class="auth-btn login-btn">登录</router-link>
+          <router-link to="/register" @click="closeMobileMenu" class="auth-btn register-btn">注册</router-link>
+        </template>
+      </div>
     </div>
     <button class="mobile-menu-btn" @click="toggleMobileMenu" v-show="isMobile">
       <span></span>
@@ -17,35 +29,42 @@
   </nav>
 </template>
 
-<script>
-export default {
-  data() {
-    return {
-      mobileMenuOpen: false,
-      isMobile: false
-    }
-  },
-  mounted() {
-    this.checkMobile()
-    window.addEventListener('resize', this.checkMobile)
-  },
-  beforeUnmount() {
-    window.removeEventListener('resize', this.checkMobile)
-  },
-  methods: {
-    checkMobile() {
-      this.isMobile = window.innerWidth <= 768
-      if (!this.isMobile) {
-        this.mobileMenuOpen = false
-      }
-    },
-    toggleMobileMenu() {
-      this.mobileMenuOpen = !this.mobileMenuOpen
-    },
-    closeMobileMenu() {
-      this.mobileMenuOpen = false
-    }
+<script setup>
+import { ref } from 'vue';
+import { useRouter } from 'vue-router';
+import { useUserStore } from '../stores/user';
+
+const router = useRouter();
+const userStore = useUserStore();
+
+const mobileMenuOpen = ref(false);
+const isMobile = ref(false);
+
+const checkMobile = () => {
+  isMobile.value = window.innerWidth <= 768;
+  if (!isMobile.value) {
+    mobileMenuOpen.value = false;
   }
+};
+
+const toggleMobileMenu = () => {
+  mobileMenuOpen.value = !mobileMenuOpen.value;
+};
+
+const closeMobileMenu = () => {
+  mobileMenuOpen.value = false;
+};
+
+const handleLogout = () => {
+  userStore.logout();
+  router.push('/login');
+  closeMobileMenu();
+};
+
+// 初始化和监听窗口大小变化
+if (typeof window !== 'undefined') {
+  checkMobile();
+  window.addEventListener('resize', checkMobile);
 }
 </script>
 
@@ -87,6 +106,59 @@ export default {
   color: white !important;
   padding: 0 !important;
   margin: 0 !important;
+}
+
+/* 认证相关样式 */
+.auth-section {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-left: 20px;
+}
+
+.welcome-text {
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.9);
+  font-weight: 500;
+}
+
+.auth-btn {
+  padding: 6px 16px;
+  border-radius: 20px;
+  font-size: 14px;
+  font-weight: 500;
+  text-decoration: none;
+  transition: all 0.3s;
+  border: none;
+  cursor: pointer;
+}
+
+.login-btn {
+  background: rgba(255, 255, 255, 0.2);
+  color: white;
+}
+
+.login-btn:hover {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+.register-btn {
+  background: white;
+  color: #667eea;
+}
+
+.register-btn:hover {
+  background: rgba(255, 255, 255, 0.9);
+  transform: translateY(-1px);
+}
+
+.logout-btn {
+  background: rgba(255, 255, 255, 0.15);
+  color: white;
+}
+
+.logout-btn:hover {
+  background: rgba(255, 255, 255, 0.25);
 }
 
 .mobile-menu-btn {
@@ -146,6 +218,26 @@ export default {
   .menu a:hover,
   .menu a.router-link-active {
     background: rgba(255, 255, 255, 0.2);
+  }
+
+  .auth-section {
+    flex-direction: column;
+    width: 100%;
+    margin: 16px 0 0 0;
+    padding: 16px;
+    background: rgba(0, 0, 0, 0.1);
+    border-radius: 10px;
+  }
+
+  .welcome-text {
+    margin-bottom: 8px;
+    text-align: center;
+  }
+
+  .auth-btn {
+    width: 100%;
+    text-align: center;
+    padding: 12px;
   }
 }
 
