@@ -42,7 +42,7 @@ public class FlinkRoadStatusStream {
                 .finish();
 
         DataStream<Row> roadStatusStream = env.createInput(jdbcInput);
-        roadStatusStream.addSink((SinkFunction<Row>) new PrintSinkFunction<>());
+        roadStatusStream.addSink(new PrintSinkFunction<>());
         env.execute("Flink Road Status Stream");
     }
 }
