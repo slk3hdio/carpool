@@ -28,7 +28,7 @@ public class CongestionSection {
     @Column(name = "status_desc", length = 50)
     private String statusDesc;
 
-    @Column(name = "speed", precision = 5, scale = 2)
+    @Column(name = "speed")
     private BigDecimal speed;
 
     @Column(name = "congestion_distance")
