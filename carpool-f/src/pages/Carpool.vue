@@ -3,6 +3,10 @@
     <div class="page-header">
       <h1 class="page-title">同城拼车</h1>
       <p class="page-subtitle">寻找附近的拼车伙伴,共享出行,节约成本</p>
+      <button class="publish-btn" @click="showPublishPanel">
+        <span class="icon">➕</span>
+        <span>发布拼车</span>
+      </button>
     </div>
 
     <!-- 筛选器 -->
@@ -103,22 +107,31 @@
       :loading="loading"
       @contact="handleContact"
     />
+
+    <!-- 发布拼车面板 -->
+    <CarpoolPanel
+      v-model:visible="showPanel"
+      @submitted="handlePublishSuccess"
+    />
   </div>
 </template>
 
 <script>
 import CarpoolCardGrid from '@/components/CarpoolCardGrid.vue'
+import CarpoolPanel from '@/components/CarpoolPanel.vue'
 import trafficService from '@/services/trafficService'
 
 export default {
   name: 'Carpool',
   components: {
-    CarpoolCardGrid
+    CarpoolCardGrid,
+    CarpoolPanel
   },
   data() {
     return {
       loading: false,
       requests: [],
+      showPanel: false,
       filters: {
         startLocation: '',
         endLocation: '',
@@ -221,6 +234,15 @@ export default {
         console.error('联系拼车用户失败:', error)
         this.$message?.error('联系拼车用户失败,请稍后重试')
       }
+    },
+
+    showPublishPanel() {
+      this.showPanel = true
+    },
+
+    handlePublishSuccess() {
+      // 刷新拼车列表
+      this.loadCarpoolRequests()
     }
   }
 }
@@ -239,9 +261,10 @@ export default {
   max-width: 800px;
   margin: 0 auto 40px;
   padding: 0 20px;
+  position: relative;
 }
 
- .page-title {
+.page-title {
   font-size: 2.5rem;
   font-weight: 700;
   color: #2c3e50;
@@ -257,6 +280,34 @@ export default {
   color: #666;
   margin: 0;
   line-height: 1.6;
+}
+
+.publish-btn {
+  position: absolute;
+  top: 0;
+  right: 20px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 24px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border: none;
+  border-radius: 24px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+}
+
+.publish-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+}
+
+.publish-btn .icon {
+  font-size: 20px;
 }
 
 /* 筛选器区域 */
@@ -410,12 +461,26 @@ export default {
     padding: 16px;
   }
 
+  .page-header {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+    padding: 0 0 20px 0;
+  }
+
   .page-header h2 {
     font-size: 1.5rem;
   }
 
   .page-header p {
     font-size: 0.9rem;
+  }
+
+  .publish-btn {
+    position: static;
+    width: 100%;
+    justify-content: center;
   }
 
   .filters-section {
@@ -462,6 +527,11 @@ export default {
 
   .stats-section {
     margin-bottom: 24px;
+  }
+
+  .publish-btn {
+    padding: 10px 20px;
+    font-size: 14px;
   }
 }
 </style>
