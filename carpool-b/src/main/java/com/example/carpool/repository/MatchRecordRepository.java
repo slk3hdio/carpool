@@ -37,4 +37,8 @@ public interface MatchRecordRepository extends JpaRepository<MatchRecord, Long> 
 
     // 删除某个行程的所有匹配记录
     void deleteByTripId(Long tripId);
+
+    // 根据用户ID查找所有行程ID（去重）
+    @Query("SELECT DISTINCT mr.tripId FROM MatchRecord mr WHERE mr.userId = :userId")
+    List<Long> findDistinctTripIdsByUserId(@Param("userId") Long userId);
 }

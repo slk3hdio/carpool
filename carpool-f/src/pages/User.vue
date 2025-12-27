@@ -56,6 +56,14 @@
         </button>
         <button
           class="tab-btn"
+          :class="{ active: activeTab === 'trips' }"
+          @click="activeTab = 'trips'"
+        >
+          <span class="tab-icon">🛣️</span>
+          <span>我的行程</span>
+        </button>
+        <button
+          class="tab-btn"
           :class="{ active: activeTab === 'invitations' }"
           @click="activeTab = 'invitations'"
         >
@@ -142,6 +150,16 @@
         </div>
         </div>
 
+        <!-- 我的行程标签页 -->
+        <div v-show="activeTab === 'trips'" class="tab-content">
+          <TripCardGrid
+            :trips="trips"
+            :loading="loadingTrips"
+            :show-actions="true"
+            @refresh="fetchTrips"
+          />
+        </div>
+
         <!-- 收到的邀请标签页 -->
         <div v-show="activeTab === 'invitations'" class="tab-content">
           <InvitationList
@@ -165,14 +183,60 @@
 </template>
 
 <script setup>
-import { ref } from 'vue';
+import { ref, onMounted, watch } from 'vue';
 import { useRouter } from 'vue-router';
 import { useUserStore } from '../stores/user';
+import axios from 'axios';
 import InvitationList from '../components/InvitationList.vue';
+import TripCardGrid from '../components/TripCardGrid.vue';
 
 const router = useRouter();
 const userStore = useUserStore();
 const activeTab = ref('overview');
+
+// 行程数据
+const trips = ref([]);
+const loadingTrips = ref(false);
+
+// 获取用户行程
+const fetchTrips = async () => {
+  if (!userStore.isAuthenticated) return;
+
+  loadingTrips.value = true;
+  try {
+    const response = await axios.get('http://localhost:8080/api/trip/user', {
+      headers: {
+        'Authorization': `Bearer ${userStore.token}`
+      }
+    });
+    trips.value = response.data || [];
+  } catch (error) {
+    console.error('获取行程列表失败:', error);
+    if (error.response?.status === 401) {
+      alert('登录已过期，请重新登录');
+      userStore.logout();
+      router.push('/login');
+    } else {
+      trips.value = [];
+    }
+  } finally {
+    loadingTrips.value = false;
+  }
+};
+
+// 监听标签页切换，当切换到行程标签时加载数据
+watch(activeTab, (newTab) => {
+  if (newTab === 'trips' && trips.value.length === 0) {
+    fetchTrips();
+  }
+});
+
+// 组件挂载时如果默认选中行程标签，则加载数据
+onMounted(() => {
+  if (activeTab.value === 'trips') {
+    fetchTrips();
+  }
+});
 
 const handleLogout = () => {
   if (confirm('确定要退出登录吗？')) {

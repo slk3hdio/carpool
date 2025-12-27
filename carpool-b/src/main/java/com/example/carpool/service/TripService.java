@@ -151,6 +151,51 @@ public class TripService {
     }
 
     /**
+     * 获取用户的所有行程
+     * @param userId 用户ID
+     * @return 行程列表
+     */
+    public List<TripResponse> getTripsByUserId(Long userId) {
+        // 通过match_record表查找用户参与的所有行程ID
+        List<Long> tripIds = matchRecordRepository.findDistinctTripIdsByUserId(userId);
+
+        if (tripIds.isEmpty()) {
+            return List.of();
+        }
+
+        // 根据行程ID列表获取行程详情，按创建时间倒序
+        List<TripRecord> trips = tripRecordRepository.findByIdInOrderByCreatedAtDesc(tripIds);
+
+        // 构建响应对象
+        return trips.stream()
+                .map(this::buildTripResponse)
+                .collect(Collectors.toList());
+    }
+
+    /**
+     * 验证用户是否有权限操作指定行程
+     * @param tripId 行程ID
+     * @param userId 用户ID
+     * @return true 如果用户有权限，否则抛出异常
+     */
+    public boolean validateUserPermissionForTrip(Long tripId, Long userId) {
+        // 检查行程是否存在
+        TripRecord trip = tripRecordRepository.findById(tripId)
+                .orElseThrow(() -> new IllegalArgumentException("行程不存在"));
+
+        // 检查用户是否参与了该行程
+        List<MatchRecord> matchRecords = matchRecordRepository.findByTripId(tripId);
+        boolean hasPermission = matchRecords.stream()
+                .anyMatch(mr -> mr.getUserId().equals(userId));
+
+        if (!hasPermission) {
+            throw new IllegalArgumentException("您没有权限操作此行程");
+        }
+
+        return true;
+    }
+
+    /**
      * 构建行程响应对象
      */
     private TripResponse buildTripResponse(TripRecord trip) {

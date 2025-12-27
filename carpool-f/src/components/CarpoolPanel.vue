@@ -20,10 +20,10 @@
         <h3>发布拼车</h3>
 
         <!-- 用户ID (通常从登录状态获取) -->
-        <div class="item">
+        <!-- <div class="item">
           <label>用户ID</label>
           <input type="number" v-model="form.userId" placeholder="请输入用户ID" />
-        </div>
+        </div> -->
 
         <!-- 是否有车 -->
         <div class="item">

@@ -10,6 +10,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -23,6 +25,8 @@ import java.util.stream.Collectors;
 @Service
 @Transactional(readOnly = true)
 public class TrafficService {
+
+    private static final Logger logger = LoggerFactory.getLogger(TrafficService.class);
 
     @Autowired
     private RoadTrafficRepository roadTrafficRepository;
@@ -198,36 +202,62 @@ public class TrafficService {
             LocalDateTime startTime, LocalDateTime endTime,
             Pageable pageable) {
 
+        logger.info("========== 开始查询历史路况数据 ==========");
+        logger.info("查询参数 - 道路名称: {}, 城市名称: {}, 开始时间: {}, 结束时间: {}",
+                roadName, city, startTime, endTime);
+        logger.info("分页参数 - 页码: {}, 每页大小: {}, 排序: {}",
+                pageable.getPageNumber(), pageable.getPageSize(), pageable.getSort());
+
         // 参数验证
+        logger.debug("步骤1: 验证查询参数...");
         validateHistoricalQueryParams(roadName, city, startTime, endTime);
+        logger.debug("步骤1完成: 参数验证通过 ✓");
 
         // 检查时间范围是否超过限制
+        logger.debug("步骤2: 检查时间范围...");
         long hoursBetween = ChronoUnit.HOURS.between(startTime, endTime);
+        logger.debug("查询时间跨度: {} 小时 (约 {} 天)", hoursBetween, String.format("%.1f", hoursBetween / 24.0));
         if (hoursBetween > 30 * 24) { // 30天限制
+            logger.warn("查询时间范围超过30天限制：{}小时", hoursBetween);
             throw new IllegalArgumentException("查询时间范围不能超过30天");
         }
+        logger.debug("步骤2完成: 时间范围检查通过 ✓");
 
-        // 标准化城市名称用于查询
-        String normalizedCity = normalizeCityName(city.trim());
+        // 直接使用原始城市名称和道路名称（不做任何标准化处理）
+        logger.debug("步骤3: 准备查询参数...");
+        String trimmedCity = city.trim();
         String trimmedRoadName = roadName.trim();
+        logger.info("最终查询参数 - 城市名称: [{}], 道路名称: [{}]", trimmedCity, trimmedRoadName);
+        logger.debug("步骤3完成: 查询参数准备完成 ✓");
 
-        // 检查数据量是否过大（使用标准化的城市名称）
-        Long dataCount = roadTrafficRepository.countHistoricalTraffic(trimmedRoadName, normalizedCity, startTime, endTime);
+        // 检查数据量是否过大
+        logger.debug("步骤4: 检查数据量...");
+        Long dataCount = roadTrafficRepository.countHistoricalTraffic(trimmedRoadName, trimmedCity, startTime, endTime);
+        logger.info("数据库中符合条件的数据总量: {} 条", dataCount);
         if (dataCount > 5000) { // 单次查询最多5000条数据
+            logger.warn("查询数据量过大：{}条，超过5000条限制", dataCount);
             throw new IllegalArgumentException("查询数据量过大，请缩小时间范围");
         }
+        logger.debug("步骤4完成: 数据量检查通过 ✓");
 
-        // 先尝试标准化的城市名称
-        Page<RoadTrafficOverall> trafficPage = roadTrafficRepository.findHistoricalTraffic(
-                trimmedRoadName, normalizedCity, startTime, endTime, pageable);
-
-        // 如果没有找到数据，尝试原始城市名称
-        if (trafficPage.getContent().isEmpty()) {
-            trafficPage = roadTrafficRepository.findHistoricalTraffic(
-                    trimmedRoadName, city.trim(), startTime, endTime, pageable);
+        if (dataCount == 0) {
+            logger.warn("警告: 数据库中没有符合条件的历史记录！");
+            logger.warn("提示: 请检查城市名称和道路名称是否正确，以及数据库中是否有该时间段的数据");
         }
 
+        // 查询历史数据
+        logger.debug("步骤5: 执行数据库查询...");
+        long queryStartTime = System.currentTimeMillis();
+        Page<RoadTrafficOverall> trafficPage = roadTrafficRepository.findHistoricalTraffic(
+                trimmedRoadName, trimmedCity, startTime, endTime, pageable);
+        long queryEndTime = System.currentTimeMillis();
+        logger.info("步骤5完成: 数据库查询完成 ✓ (耗时: {} ms)", queryEndTime - queryStartTime);
+        logger.info("查询返回数据量: {} 条, 总记录数: {} 条, 总页数: {} 页",
+                trafficPage.getContent().size(), trafficPage.getTotalElements(), trafficPage.getTotalPages());
+
         // 为每条历史数据补充速度信息
+        logger.debug("步骤6: 补充速度和拥堵距离信息...");
+        long enrichStartTime = System.currentTimeMillis();
         List<TrafficResponse> responses = trafficPage.getContent().stream()
                 .map(traffic -> {
                     TrafficResponse response = convertToTrafficResponse(traffic);
@@ -244,6 +274,32 @@ public class TrafficService {
                     return response;
                 })
                 .collect(Collectors.toList());
+        long enrichEndTime = System.currentTimeMillis();
+        logger.debug("步骤6完成: 数据信息补充完成 ✓ (耗时: {} ms)", enrichEndTime - enrichStartTime);
+
+        // 记录查询结果统计
+        if (!responses.isEmpty()) {
+            logger.info("========== 查询结果统计 ==========");
+            logger.info("返回结果数: {} 条", responses.size());
+            logger.info("总记录数: {} 条", trafficPage.getTotalElements());
+            logger.info("当前页: {}/{}, 每页大小: {} 条",
+                    trafficPage.getPageable().getPageNumber() + 1,
+                    trafficPage.getTotalPages(),
+                    trafficPage.getPageable().getPageSize());
+
+            // 统计各状态的数量
+            Map<Integer, Long> statusStats = responses.stream()
+                    .collect(Collectors.groupingBy(
+                            TrafficResponse::getEvaluationStatus,
+                            Collectors.counting()
+                    ));
+            logger.info("状态分布: {}", statusStats);
+            logger.info("==================================");
+        } else {
+            logger.warn("查询结果为空，未返回任何历史数据");
+        }
+
+        logger.info("========== 历史路况数据查询完成 ==========");
 
         return new PageImpl<>(responses, trafficPage.getPageable(), trafficPage.getTotalElements());
     }
@@ -263,14 +319,9 @@ public class TrafficService {
             throw new IllegalArgumentException("城市名称不能为空");
         }
 
-        // 尝试标准化的城市名称（移除"市"后缀）
-        String normalizedCity = normalizeCityName(city.trim());
-        List<String> roads = roadTrafficRepository.findDistinctRoadsByCity(normalizedCity);
-
-        // 如果没有找到，尝试原始城市名称
-        if (roads.isEmpty()) {
-            roads = roadTrafficRepository.findDistinctRoadsByCity(city.trim());
-        }
+        // 直接使用原始城市名称（不做标准化处理）
+        String trimmedCity = city.trim();
+        List<String> roads = roadTrafficRepository.findDistinctRoadsByCity(trimmedCity);
 
         if (roads.isEmpty()) {
             throw new IllegalArgumentException("城市 '" + city + "' 暂无数据或城市名称错误");
@@ -301,16 +352,13 @@ public class TrafficService {
             throw new IllegalArgumentException("结束时间不能超过当前时间");
         }
 
-        // 标准化城市名称（移除"市"后缀）
-        String normalizedCity = normalizeCityName(city.trim());
+        // 直接使用原始城市名称和道路名称（不做标准化处理）
+        String trimmedCity = city.trim();
         String trimmedRoadName = roadName.trim();
 
         // 检查道路是否存在
-        if (!roadTrafficRepository.existsByRoadNameAndCity(trimmedRoadName, normalizedCity)) {
-            // 尝试原始城市名称
-            if (!roadTrafficRepository.existsByRoadNameAndCity(trimmedRoadName, city.trim())) {
-                throw new IllegalArgumentException("道路 '" + roadName + "' 在城市 '" + city + "' 中不存在");
-            }
+        if (!roadTrafficRepository.existsByRoadNameAndCity(trimmedRoadName, trimmedCity)) {
+            throw new IllegalArgumentException("道路 '" + roadName + "' 在城市 '" + city + "' 中不存在");
         }
     }
 

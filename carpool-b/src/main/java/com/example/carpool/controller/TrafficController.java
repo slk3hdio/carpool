@@ -3,6 +3,8 @@ package com.example.carpool.controller;
 import com.example.carpool.dto.TrafficResponse;
 import com.example.carpool.dto.TrafficStatsResponse;
 import com.example.carpool.service.TrafficService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -19,6 +21,8 @@ import java.util.List;
 @RequestMapping("/traffic")
 @CrossOrigin(origins = {"http://localhost:5173", "http://localhost:5175","http://localhost:5176","http://localhost:8080"})
 public class TrafficController {
+
+    private static final Logger logger = LoggerFactory.getLogger(TrafficController.class);
 
     @Autowired
     private TrafficService trafficService;
@@ -144,13 +148,31 @@ public class TrafficController {
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "100") int size) {
 
+        long requestStartTime = System.currentTimeMillis();
+        logger.info("========== 收到历史路况查询请求 ==========");
+        logger.info("请求参数 - 道路名称: [{}], 城市: [{}], 开始时间: [{}], 结束时间: [{}]",
+                roadName, city, startTime, endTime);
+        logger.info("分页参数 - 页码: {}, 每页大小: {}", page, size);
+
         try {
             Pageable pageable = PageRequest.of(page, size, Sort.by("requestTime").ascending());
+            logger.debug("分页对象创建完成: {}", pageable);
+
             Page<TrafficResponse> historicalData = trafficService.getHistoricalTraffic(
                     roadName, city, startTime, endTime, pageable);
+
+            long requestEndTime = System.currentTimeMillis();
+            logger.info("请求处理完成 - 返回 {} 条记录, 总耗时: {} ms",
+                    historicalData.getContent().size(), requestEndTime - requestStartTime);
+            logger.info("========== 历史路况查询请求处理完成 ==========");
+
             return ResponseEntity.ok(historicalData);
         } catch (IllegalArgumentException e) {
+            logger.error("参数错误: {}", e.getMessage());
             throw new RuntimeException(e.getMessage()); // 会被全局异常处理器处理
+        } catch (Exception e) {
+            logger.error("查询历史路况数据时发生异常", e);
+            throw new RuntimeException("查询历史路况数据失败: " + e.getMessage());
         }
     }
 
@@ -159,11 +181,18 @@ public class TrafficController {
      */
     @GetMapping("/cities/{city}/roads")
     public ResponseEntity<List<String>> getRoadsByCity(@PathVariable String city) {
+        logger.info("收到获取城市道路列表请求 - 城市: [{}]", city);
+
         try {
             List<String> roads = trafficService.getRoadsByCity(city);
+            logger.info("查询成功 - 找到 {} 条道路", roads.size());
             return ResponseEntity.ok(roads);
         } catch (IllegalArgumentException e) {
-            throw new RuntimeException(e.getMessage()); // 会被全局异常处理器处理
+            logger.error("参数错误: {}", e.getMessage());
+            throw new RuntimeException(e.getMessage());
+        } catch (Exception e) {
+            logger.error("获取城市道路列表时发生异常 - 城市: [{}]", city, e);
+            throw new RuntimeException("获取城市道路列表失败: " + e.getMessage());
         }
     }
 
@@ -172,7 +201,16 @@ public class TrafficController {
      */
     @GetMapping("/cities")
     public ResponseEntity<List<String>> getSupportedCities() {
-        List<String> cities = trafficService.getSupportedCities();
-        return ResponseEntity.ok(cities);
+        logger.info("收到获取支持城市列表请求");
+
+        try {
+            List<String> cities = trafficService.getSupportedCities();
+            logger.info("查询成功 - 找到 {} 个城市", cities.size());
+            logger.debug("城市列表: {}", cities);
+            return ResponseEntity.ok(cities);
+        } catch (Exception e) {
+            logger.error("获取支持城市列表时发生异常", e);
+            throw new RuntimeException("获取支持城市列表失败: " + e.getMessage());
+        }
     }
 }

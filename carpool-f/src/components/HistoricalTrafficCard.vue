@@ -475,14 +475,30 @@ export default {
         }
 
         const timeRange = timeRangeMap[selectedTimeRange.value] || timeRangeMap['1h']
-        const startTime = new Date(now.getTime() - timeRange).toISOString()
+        const startDate = new Date(now.getTime() - timeRange)
+
+        // 格式化为本地时间字符串（ISO格式），保留时区信息
+        const formatLocalISO = (date) => {
+          const year = date.getFullYear()
+          const month = String(date.getMonth() + 1).padStart(2, '0')
+          const day = String(date.getDate()).padStart(2, '0')
+          const hours = String(date.getHours()).padStart(2, '0')
+          const minutes = String(date.getMinutes()).padStart(2, '0')
+          const seconds = String(date.getSeconds()).padStart(2, '0')
+          return `${year}-${month}-${day}T${hours}:${minutes}:${seconds}`
+        }
+
+        const startTime = formatLocalISO(startDate)
+        const endTime = formatLocalISO(now)
+
+        console.log('查询时间范围:', { startTime, endTime })
 
         // 调用历史数据API（需要后端实现）
         const response = await trafficService.getHistoricalTraffic({
           roadName: selectedRoad.value,
           city: selectedCity.value,
           startTime: startTime,
-          endTime: now.toISOString()
+          endTime: endTime
         })
 
         historicalData.value = response || []

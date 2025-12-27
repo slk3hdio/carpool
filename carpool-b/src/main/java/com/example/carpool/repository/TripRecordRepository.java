@@ -24,4 +24,11 @@ public interface TripRecordRepository extends JpaRepository<TripRecord, Long> {
            "INNER JOIN MatchRecord mr ON tr.id = mr.tripId " +
            "WHERE mr.requestId = :requestId")
     boolean existsByRequestId(@Param("requestId") Long requestId);
+
+    // 根据ID列表查找行程
+    List<TripRecord> findByIdIn(List<Long> ids);
+
+    // 根据ID列表查找行程，按创建时间倒序
+    @Query("SELECT tr FROM TripRecord tr WHERE tr.id IN :ids ORDER BY tr.createdAt DESC")
+    List<TripRecord> findByIdInOrderByCreatedAtDesc(@Param("ids") List<Long> ids);
 }
