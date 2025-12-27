@@ -25,7 +25,7 @@ public interface MatchRecordRepository extends JpaRepository<MatchRecord, Long> 
     Optional<MatchRecord> findByRequestIdAndUserId(Long requestId, Long userId);
 
     // 查找某个拼车需求是否已有行程
-    @Query("SELECT mr.tripId FROM MatchRecord mr WHERE mr.requestId = :requestId LIMIT 1")
+    @Query("SELECT mr.tripId FROM MatchRecord mr WHERE mr.requestId = :requestId")
     Optional<Long> findTripIdByRequestId(@Param("requestId") Long requestId);
 
     // 统计某个行程的乘客数（匹配记录数量）
