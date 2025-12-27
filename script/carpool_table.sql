@@ -34,6 +34,7 @@ CREATE TABLE trip_record (
     end_latitude DECIMAL(10, 7) COMMENT '终点纬度',
     end_longitude DECIMAL(10, 7) COMMENT '终点经度',
     departure_at DATETIME NOT NULL COMMENT '出发时间',
+    arrival_at DATETIME NOT NULL COMMENT '到达时间',
     status_desc VARCHAR(50) NOT NULL COMMENT '行程状态描述',
     passenger_count INT NOT NULL COMMENT '乘客数量',
 

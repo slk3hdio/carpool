@@ -27,6 +27,9 @@ public class InvitationService {
     @Autowired
     private UserRepository userRepository;
 
+    @Autowired
+    private TripService tripService;
+
     /**
      * 创建拼车邀请
      */
@@ -187,6 +190,9 @@ public class InvitationService {
 
         invitation.setStatus(2); // 已接受
         CarpoolInvitation savedInvitation = invitationRepository.save(invitation);
+
+        // 创建或更新行程（同时创建匹配记录）
+        tripService.acceptInvitationAndCreateTrip(savedInvitation.getId());
 
         InvitationResponse response = new InvitationResponse(savedInvitation);
 

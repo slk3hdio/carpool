@@ -6,6 +6,7 @@
           <span class="avatar-icon">{{ hasCarIcon }}</span>
         </div>
         <div class="user-details">
+          <div class="user-name">{{ displayUserName }}</div>
           <div class="user-type">{{ userTypeText }}</div>
           <div class="passenger-count" v-if="!request.hasCar">
             乘客人数: {{ request.passengerCount }}人
@@ -88,6 +89,17 @@ export default {
   computed: {
     hasCarIcon() {
       return this.request.hasCar ? '🚗' : '👤'
+    },
+
+    displayUserName() {
+      // 优先显示真实姓名，其次显示用户名
+      if (this.request.realName) {
+        return this.request.realName;
+      }
+      if (this.request.username) {
+        return this.request.username;
+      }
+      return '用户' + (this.request.userId || '');
     },
 
     userTypeText() {
@@ -194,10 +206,16 @@ export default {
   min-width: 0;
 }
 
-.user-type {
+.user-name {
   font-size: 1rem;
   font-weight: 600;
   color: #2c3e50;
+  margin-bottom: 4px;
+}
+
+.user-type {
+  font-size: 0.85rem;
+  color: #666;
   margin-bottom: 4px;
 }
 

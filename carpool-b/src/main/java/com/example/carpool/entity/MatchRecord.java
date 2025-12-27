@@ -15,6 +15,9 @@ public class MatchRecord {
     @Column(name = "request_id", nullable = false)
     private Long requestId;
 
+    @Column(name = "user_id", nullable = false)
+    private Long userId;
+
     @Column(name = "trip_id", nullable = false)
     private Long tripId;
 
@@ -29,8 +32,9 @@ public class MatchRecord {
 
     public MatchRecord() {}
 
-    public MatchRecord(Long requestId, Long tripId) {
+    public MatchRecord(Long requestId, Long userId, Long tripId) {
         this.requestId = requestId;
+        this.userId = userId;
         this.tripId = tripId;
     }
 
@@ -48,6 +52,14 @@ public class MatchRecord {
 
     public void setRequestId(Long requestId) {
         this.requestId = requestId;
+    }
+
+    public Long getUserId() {
+        return userId;
+    }
+
+    public void setUserId(Long userId) {
+        this.userId = userId;
     }
 
     public Long getTripId() {
@@ -71,6 +83,7 @@ public class MatchRecord {
         return "MatchRecord{" +
                 "id=" + id +
                 ", requestId=" + requestId +
+                ", userId=" + userId +
                 ", tripId=" + tripId +
                 ", createdAt=" + createdAt +
                 '}';

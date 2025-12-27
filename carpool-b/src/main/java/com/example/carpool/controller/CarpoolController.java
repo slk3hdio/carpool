@@ -1,6 +1,7 @@
 package com.example.carpool.controller;
 
 import com.example.carpool.dto.CarpoolRequestDto;
+import com.example.carpool.dto.CarpoolRequestResponse;
 import com.example.carpool.entity.CarpoolRequest;
 import com.example.carpool.service.CarpoolService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,7 +32,7 @@ public class CarpoolController {
     }
 
     @GetMapping("/requests")
-    public ResponseEntity<List<CarpoolRequest>> searchRequests(
+    public ResponseEntity<List<CarpoolRequestResponse>> searchRequests(
             @RequestParam(required = false) String statusDesc,
             @RequestParam(required = false) Double startLat,
             @RequestParam(required = false) Double startLng,
@@ -39,7 +40,7 @@ public class CarpoolController {
             @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") LocalDateTime earliestTime,
             @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") LocalDateTime latestTime) {
         try {
-            List<CarpoolRequest> requests = carpoolService.searchRequests(statusDesc, startLat, startLng, radius, earliestTime, latestTime);
+            List<CarpoolRequestResponse> requests = carpoolService.searchRequestsWithUserInfo(statusDesc, startLat, startLng, radius, earliestTime, latestTime);
             return ResponseEntity.ok(requests);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
