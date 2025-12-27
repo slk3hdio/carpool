@@ -344,6 +344,9 @@ export default {
   flex-wrap: wrap;
   gap: 20px;
   align-items: flex-end;
+  max-width: 960px; /* 限制最大宽度，减小整体宽度 */
+  margin-left: auto;
+  margin-right: auto;
 }
 
 .filter-group {
@@ -413,7 +416,8 @@ export default {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
   gap: 20px;
-  margin-bottom: 32px;
+  margin: 0 auto 32px;
+  max-width: 1200px; /* 限制最大宽度，减小整体宽度 */
 }
 
 .stat-card {

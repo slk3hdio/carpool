@@ -70,4 +70,28 @@ public class CarpoolService {
                 })
                 .collect(Collectors.toList());
     }
+
+    /**
+     * 获取用户发布的拼车需求
+     * @param userId 用户ID
+     * @return 拼车需求列表
+     */
+    public List<CarpoolRequestResponse> getRequestsByUserId(Long userId) {
+        List<CarpoolRequest> requests = carpoolRequestRepository.findByUserIdOrderByCreatedAtDesc(userId);
+
+        return requests.stream()
+                .map(request -> {
+                    CarpoolRequestResponse response = new CarpoolRequestResponse(request);
+
+                    // 加载用户信息
+                    userRepository.findById(request.getUserId()).ifPresent(user -> {
+                        response.setUsername(user.getUsername());
+                        response.setRealName(user.getRealName());
+                        response.setPhoneNumber(user.getPhoneNumber());
+                    });
+
+                    return response;
+                })
+                .collect(Collectors.toList());
+    }
 }

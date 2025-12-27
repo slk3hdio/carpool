@@ -171,10 +171,28 @@
 
         <!-- 我的发布标签页 -->
         <div v-show="activeTab === 'my-requests'" class="tab-content">
-          <div class="placeholder-section">
-            <div class="placeholder-icon">🚗</div>
-            <h3>我的拼车发布</h3>
-            <p>查看您发布的所有拼车需求</p>
+          <div v-if="loadingRequests" class="loading-state">
+            <div class="loading-spinner"></div>
+            <p>加载中...</p>
+          </div>
+
+          <div v-else-if="myRequests.length === 0" class="empty-state">
+            <div class="empty-icon">🚗</div>
+            <h3>暂无发布记录</h3>
+            <p>您还没有发布过拼车需求</p>
+            <router-link to="/carpool" class="btn btn-primary">
+              立即发布
+            </router-link>
+          </div>
+
+          <div v-else class="my-requests-grid">
+            <CarpoolCard
+              v-for="request in myRequests"
+              :key="request.id"
+              :request="request"
+              @contact="handleContactRequest"
+              @invite="handleInviteRequest"
+            />
           </div>
         </div>
       </div>
@@ -189,6 +207,7 @@ import { useUserStore } from '../stores/user';
 import axios from 'axios';
 import InvitationList from '../components/InvitationList.vue';
 import TripCardGrid from '../components/TripCardGrid.vue';
+import CarpoolCard from '../components/CarpoolCard.vue';
 
 const router = useRouter();
 const userStore = useUserStore();
@@ -197,6 +216,10 @@ const activeTab = ref('overview');
 // 行程数据
 const trips = ref([]);
 const loadingTrips = ref(false);
+
+// 我发布的需求数据
+const myRequests = ref([]);
+const loadingRequests = ref(false);
 
 // 获取用户行程
 const fetchTrips = async () => {
@@ -224,17 +247,49 @@ const fetchTrips = async () => {
   }
 };
 
-// 监听标签页切换，当切换到行程标签时加载数据
+// 获取用户发布的拼车需求
+const fetchMyRequests = async () => {
+  if (!userStore.isAuthenticated) return;
+
+  loadingRequests.value = true;
+  try {
+    const response = await axios.get('http://localhost:8080/api/carpool/my-requests', {
+      headers: {
+        'Authorization': `Bearer ${userStore.token}`
+      }
+    });
+    myRequests.value = response.data || [];
+  } catch (error) {
+    console.error('获取我的发布失败:', error);
+    if (error.response?.status === 401) {
+      alert('登录已过期，请重新登录');
+      userStore.logout();
+      router.push('/login');
+    } else {
+      myRequests.value = [];
+    }
+  } finally {
+    loadingRequests.value = false;
+  }
+};
+
+// 监听标签页切换，加载数据
 watch(activeTab, (newTab) => {
   if (newTab === 'trips' && trips.value.length === 0) {
     fetchTrips();
   }
+  if (newTab === 'my-requests' && myRequests.value.length === 0) {
+    fetchMyRequests();
+  }
 });
 
-// 组件挂载时如果默认选中行程标签，则加载数据
+// 组件挂载时如果默认选中某个标签，则加载数据
 onMounted(() => {
   if (activeTab.value === 'trips') {
     fetchTrips();
+  }
+  if (activeTab.value === 'my-requests') {
+    fetchMyRequests();
   }
 });
 
@@ -260,6 +315,16 @@ const formatDate = (dateString) => {
 const handleViewInvitation = (invitation) => {
   console.log('查看邀请详情:', invitation);
   // 可以添加详情查看逻辑
+};
+
+const handleContactRequest = (request) => {
+  console.log('联系车主:', request);
+  alert(`联系车主: ${request.realName || request.username}\n电话: ${request.phoneNumber}`);
+};
+
+const handleInviteRequest = (request) => {
+  console.log('发起邀请:', request);
+  alert(`向 ${request.realName || request.username} 发起拼车邀请`);
 };
 </script>
 
@@ -471,6 +536,9 @@ const handleViewInvitation = (invitation) => {
 
 .tab-content {
   animation: fadeIn 0.3s ease;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
 }
 
 @keyframes fadeIn {
@@ -642,6 +710,109 @@ const handleViewInvitation = (invitation) => {
 
   .action-buttons {
     grid-template-columns: 1fr;
+  }
+}
+
+/* 加载状态 */
+.loading-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 60px 20px;
+  text-align: center;
+}
+
+.loading-spinner {
+  width: 48px;
+  height: 48px;
+  border: 4px solid #f3f3f3;
+  border-top: 4px solid #667eea;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin-bottom: 16px;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.loading-state p {
+  font-size: 1rem;
+  color: #666;
+}
+
+/* 空状态 */
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 60px 20px;
+  text-align: center;
+  background: white;
+  border-radius: 16px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+}
+
+.empty-icon {
+  font-size: 64px;
+  margin-bottom: 20px;
+  opacity: 0.6;
+}
+
+.empty-state h3 {
+  font-size: 20px;
+  color: #333;
+  margin: 0 0 10px 0;
+}
+
+.empty-state p {
+  font-size: 14px;
+  color: #999;
+  margin: 0 0 24px 0;
+}
+
+.empty-state .btn {
+  display: inline-block;
+  padding: 12px 32px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border-radius: 24px;
+  text-decoration: none;
+  font-size: 16px;
+  font-weight: 600;
+  transition: all 0.3s;
+}
+
+.empty-state .btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+}
+
+/* 我的发布网格 */
+.my-requests-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 16px 0;
+}
+
+@media (min-width: 768px) {
+  .my-requests-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+    padding: 20px 0;
+  }
+}
+
+@media (min-width: 1024px) {
+  .my-requests-grid {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
+    padding: 24px 0;
   }
 }
 </style>

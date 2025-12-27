@@ -57,6 +57,9 @@ export default {
 .carpool-grid-container {
   width: 100%;
   min-height: 200px;
+  max-width: 1200px; /* 减小卡片显示区域的宽度 */
+  margin: 0 auto;
+  padding: 0 16px;
 }
 
 .loading-state {

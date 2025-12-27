@@ -4,6 +4,7 @@ import com.example.carpool.dto.CarpoolRequestDto;
 import com.example.carpool.dto.CarpoolRequestResponse;
 import com.example.carpool.entity.CarpoolRequest;
 import com.example.carpool.service.CarpoolService;
+import com.example.carpool.util.JwtUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
@@ -20,6 +21,9 @@ public class CarpoolController {
 
     @Autowired
     private CarpoolService carpoolService;
+
+    @Autowired
+    private JwtUtil jwtUtil;
 
     @PostMapping("/request")
     public ResponseEntity<CarpoolRequest> createCarpoolRequest(@RequestBody CarpoolRequestDto dto) {
@@ -44,6 +48,59 @@ public class CarpoolController {
             return ResponseEntity.ok(requests);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
+    /**
+     * 获取当前用户发布的拼车需求
+     * GET /api/carpool/my-requests
+     */
+    @GetMapping("/my-requests")
+    public ResponseEntity<?> getMyRequests(@RequestHeader(value = "Authorization", required = false) String token) {
+        try {
+            // 验证token
+            if (token == null || !token.startsWith("Bearer ")) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                        .body(new ErrorResponse("未提供认证令牌"));
+            }
+
+            String jwt = token.substring(7);
+
+            // 验证token有效性
+            if (!jwtUtil.validateToken(jwt)) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                        .body(new ErrorResponse("无效的认证令牌"));
+            }
+
+            // 从token中获取用户ID
+            Long userId = jwtUtil.getUserIdFromToken(jwt);
+
+            // 获取用户发布的拼车需求
+            List<CarpoolRequestResponse> requests = carpoolService.getRequestsByUserId(userId);
+
+            return ResponseEntity.ok(requests);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(new ErrorResponse("获取拼车需求失败：" + e.getMessage()));
+        }
+    }
+
+    /**
+     * 错误响应体
+     */
+    static class ErrorResponse {
+        private String message;
+
+        public ErrorResponse(String message) {
+            this.message = message;
+        }
+
+        public String getMessage() {
+            return message;
+        }
+
+        public void setMessage(String message) {
+            this.message = message;
         }
     }
 }

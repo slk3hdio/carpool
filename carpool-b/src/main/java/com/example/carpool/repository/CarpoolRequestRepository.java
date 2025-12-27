@@ -28,4 +28,10 @@ public interface CarpoolRequestRepository extends JpaRepository<CarpoolRequest, 
             @Param("earliestTime") LocalDateTime earliestTime,
             @Param("latestTime") LocalDateTime latestTime
     );
+
+    // 根据用户ID查找发布的拼车需求
+    List<CarpoolRequest> findByUserIdOrderByCreatedAtDesc(Long userId);
+
+    // 根据用户ID和状态查找拼车需求
+    List<CarpoolRequest> findByUserIdAndStatusDescOrderByCreatedAtDesc(Long userId, String statusDesc);
 }
