@@ -132,6 +132,35 @@ public class InvitationService {
     }
 
     /**
+     * 获取用户发布的拼车需求收到的所有邀请
+     */
+    public List<InvitationResponse> getReceivedInvitationsByUserId(Long userId) {
+        // 获取用户发布的所有拼车需求
+        List<CarpoolRequest> userRequests = carpoolRequestRepository.findAll().stream()
+                .filter(req -> req.getUserId().equals(userId))
+                .collect(Collectors.toList());
+
+        // 获取这些需求收到的所有邀请
+        return userRequests.stream()
+                .flatMap(request -> {
+                    List<CarpoolInvitation> invitations = invitationRepository.findByCarpoolRequestId(request.getId());
+                    return invitations.stream();
+                })
+                .map(invitation -> {
+                    InvitationResponse response = new InvitationResponse(invitation);
+
+                    // 加载发起者信息
+                    userRepository.findById(invitation.getInviterId()).ifPresent(inviter -> {
+                        response.setInviterName(inviter.getRealName() != null ? inviter.getRealName() : inviter.getUsername());
+                        response.setInviterPhone(inviter.getPhoneNumber());
+                    });
+
+                    return response;
+                })
+                .collect(Collectors.toList());
+    }
+
+    /**
      * 接受邀请
      */
     @Transactional

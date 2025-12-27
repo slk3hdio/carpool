@@ -44,8 +44,38 @@
         </button>
       </div>
 
+      <!-- 标签页导航 -->
+      <div class="tab-navigation">
+        <button
+          class="tab-btn"
+          :class="{ active: activeTab === 'overview' }"
+          @click="activeTab = 'overview'"
+        >
+          <span class="tab-icon">📊</span>
+          <span>概览</span>
+        </button>
+        <button
+          class="tab-btn"
+          :class="{ active: activeTab === 'invitations' }"
+          @click="activeTab = 'invitations'"
+        >
+          <span class="tab-icon">📬</span>
+          <span>收到的邀请</span>
+        </button>
+        <button
+          class="tab-btn"
+          :class="{ active: activeTab === 'my-requests' }"
+          @click="activeTab = 'my-requests'"
+        >
+          <span class="tab-icon">🚗</span>
+          <span>我的发布</span>
+        </button>
+      </div>
+
       <div class="user-content">
-        <div class="info-section">
+        <!-- 概览标签页 -->
+        <div v-show="activeTab === 'overview'" class="tab-content">
+          <div class="info-section">
           <h3>个人信息</h3>
           <div class="info-grid">
             <div class="info-item">
@@ -110,17 +140,39 @@
             </button>
           </div>
         </div>
+        </div>
+
+        <!-- 收到的邀请标签页 -->
+        <div v-show="activeTab === 'invitations'" class="tab-content">
+          <InvitationList
+            :user-id="userStore.userId"
+            :received="true"
+            @view="handleViewInvitation"
+          />
+        </div>
+
+        <!-- 我的发布标签页 -->
+        <div v-show="activeTab === 'my-requests'" class="tab-content">
+          <div class="placeholder-section">
+            <div class="placeholder-icon">🚗</div>
+            <h3>我的拼车发布</h3>
+            <p>查看您发布的所有拼车需求</p>
+          </div>
+        </div>
       </div>
     </div>
   </div>
 </template>
 
 <script setup>
+import { ref } from 'vue';
 import { useRouter } from 'vue-router';
 import { useUserStore } from '../stores/user';
+import InvitationList from '../components/InvitationList.vue';
 
 const router = useRouter();
 const userStore = useUserStore();
+const activeTab = ref('overview');
 
 const handleLogout = () => {
   if (confirm('确定要退出登录吗？')) {
@@ -139,6 +191,11 @@ const formatDate = (dateString) => {
     hour: '2-digit',
     minute: '2-digit'
   });
+};
+
+const handleViewInvitation = (invitation) => {
+  console.log('查看邀请详情:', invitation);
+  // 可以添加详情查看逻辑
 };
 </script>
 
@@ -296,6 +353,96 @@ const formatDate = (dateString) => {
 
 .logout-btn:hover {
   background: #e8e8e8;
+}
+
+/* 标签页导航 */
+.tab-navigation {
+  background: white;
+  border-radius: 16px;
+  padding: 20px;
+  margin-bottom: 20px;
+  display: flex;
+  gap: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  overflow-x: auto;
+}
+
+.tab-btn {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 16px 20px;
+  background: #f8f9ff;
+  border: 2px solid #e8ebff;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.3s;
+  min-width: 100px;
+}
+
+.tab-btn:hover {
+  background: white;
+  border-color: #667eea;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.2);
+}
+
+.tab-btn.active {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-color: transparent;
+  color: white;
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+}
+
+.tab-icon {
+  font-size: 24px;
+}
+
+.tab-btn span:last-child {
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.tab-content {
+  animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.placeholder-section {
+  background: white;
+  border-radius: 16px;
+  padding: 60px 40px;
+  text-align: center;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+}
+
+.placeholder-icon {
+  font-size: 64px;
+  margin-bottom: 20px;
+}
+
+.placeholder-section h3 {
+  font-size: 20px;
+  color: #333;
+  margin: 0 0 10px 0;
+}
+
+.placeholder-section p {
+  font-size: 14px;
+  color: #999;
+  margin: 0;
 }
 
 .user-content {

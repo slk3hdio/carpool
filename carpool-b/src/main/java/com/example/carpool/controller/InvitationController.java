@@ -65,6 +65,21 @@ public class InvitationController {
     }
 
     /**
+     * 获取用户收到的所有邀请（别人向用户发布的拼车需求发送的邀请）
+     * GET /api/carpool/invitation/received/{userId}
+     */
+    @GetMapping("/received/{userId}")
+    public ResponseEntity<?> getReceivedInvitations(@PathVariable Long userId) {
+        try {
+            List<InvitationResponse> invitations = invitationService.getReceivedInvitationsByUserId(userId);
+            return ResponseEntity.ok(invitations);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(new ErrorResponse("获取收到的邀请失败：" + e.getMessage()));
+        }
+    }
+
+    /**
      * 接受邀请
      * PUT /api/carpool/invitation/{id}/accept
      */
