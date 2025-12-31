@@ -190,11 +190,21 @@
               v-for="request in myRequests"
               :key="request.id"
               :request="request"
+              :show-edit="true"
               @contact="handleContactRequest"
               @invite="handleInviteRequest"
+              @edit="handleEditRequest"
             />
           </div>
         </div>
+
+        <!-- 拼车面板（编辑/发布） -->
+        <CarpoolPanel
+          :visible="showCarpoolPanel"
+          :edit-data="editingRequest"
+          @update:visible="showCarpoolPanel = $event"
+          @submitted="handleRequestSubmitted"
+        />
       </div>
     </div>
   </div>
@@ -208,6 +218,7 @@ import axios from 'axios';
 import InvitationList from '../components/InvitationList.vue';
 import TripCardGrid from '../components/TripCardGrid.vue';
 import CarpoolCard from '../components/CarpoolCard.vue';
+import CarpoolPanel from '../components/CarpoolPanel.vue';
 
 const router = useRouter();
 const userStore = useUserStore();
@@ -220,6 +231,10 @@ const loadingTrips = ref(false);
 // 我发布的需求数据
 const myRequests = ref([]);
 const loadingRequests = ref(false);
+
+// 编辑相关状态
+const showCarpoolPanel = ref(false);
+const editingRequest = ref(null);
 
 // 获取用户行程
 const fetchTrips = async () => {
@@ -325,6 +340,30 @@ const handleContactRequest = (request) => {
 const handleInviteRequest = (request) => {
   console.log('发起邀请:', request);
   alert(`向 ${request.realName || request.username} 发起拼车邀请`);
+};
+
+// 编辑拼车需求
+const handleEditRequest = (request) => {
+  console.log('编辑拼车需求:', request);
+  // 检查是否可以编辑
+  const status = request.statusDesc || '';
+  if (status.includes('已匹配') || status.includes('已完成')) {
+    alert('该拼车需求已经匹配，无法编辑');
+    return;
+  }
+  // 设置编辑数据并打开面板
+  editingRequest.value = request;
+  showCarpoolPanel.value = true;
+};
+
+// 拼车需求提交成功后的处理
+const handleRequestSubmitted = () => {
+  // 关闭面板
+  showCarpoolPanel.value = false;
+  // 清空编辑数据
+  editingRequest.value = null;
+  // 刷新需求列表
+  fetchMyRequests();
 };
 </script>
 

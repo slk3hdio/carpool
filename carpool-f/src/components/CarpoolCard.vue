@@ -65,6 +65,9 @@
         <span class="contact-phone">{{ maskPhone(request.phoneNumber) }}</span>
       </div>
       <div class="action-buttons">
+        <button class="action-btn edit-btn" v-if="showEdit && canEdit" @click="handleEdit">
+          编辑
+        </button>
         <button class="action-btn invite-btn" @click="handleInvite">
           发起邀请
         </button>
@@ -84,6 +87,10 @@ export default {
       type: Object,
       required: true,
       default: () => ({})
+    },
+    showEdit: {
+      type: Boolean,
+      default: false
     }
   },
   computed: {
@@ -113,6 +120,13 @@ export default {
       if (status.includes('完成')) return 'status-completed'
       if (status.includes('取消')) return 'status-cancelled'
       return 'status-default'
+    },
+
+    canEdit() {
+      // 只有等待匹配或寻找拼车状态的需求可以编辑
+      const status = this.request.statusDesc || '';
+      return status.includes('等待匹配') || status.includes('寻找拼车') ||
+             status.includes('等待中') || !status;
     }
   },
   methods: {
@@ -138,6 +152,10 @@ export default {
 
     handleInvite() {
       this.$emit('invite', this.request)
+    },
+
+    handleEdit() {
+      this.$emit('edit', this.request)
     }
   }
 }
@@ -440,6 +458,15 @@ export default {
 
 .action-btn:active {
   transform: translateY(0);
+}
+
+.edit-btn {
+  background: linear-gradient(135deg, #FFA726, #FB8C00);
+}
+
+.edit-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(255, 167, 38, 0.4);
 }
 
 /* 响应式设计 */

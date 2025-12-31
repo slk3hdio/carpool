@@ -17,7 +17,7 @@
 
       <!-- 内容区域 -->
       <div class="content">
-        <h3>发布拼车</h3>
+        <h3>{{ panelTitle }}</h3>
 
         <!-- 用户ID (通常从登录状态获取) -->
         <!-- <div class="item">
@@ -107,7 +107,7 @@
 
         <!-- 提交按钮 -->
         <button class="submit-btn" @click="submitForm" :disabled="submitting">
-          {{ submitting ? '提交中...' : '发布拼车' }}
+          {{ submitButtonText }}
         </button>
       </div>
     </div>
@@ -115,7 +115,7 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue';
+import { ref, computed, watch } from 'vue';
 import axios from 'axios';
 import { useUserStore } from '../stores/user';
 
@@ -123,6 +123,10 @@ const props = defineProps({
   visible: {
     type: Boolean,
     default: false
+  },
+  editData: {
+    type: Object,
+    default: null
   }
 });
 
@@ -130,7 +134,7 @@ const emit = defineEmits(['update:visible', 'submitted']);
 const userStore = useUserStore();
 
 const form = ref({
-  userId: userStore.userId || null, // 从登录状态获取用户ID
+  userId: userStore.userId || null,
   hasCar: true,
   maxPassengerCount: 4,
   passengerCount: 1,
@@ -147,13 +151,61 @@ const form = ref({
 });
 
 const submitting = ref(false);
+const isEditMode = computed(() => props.editData !== null);
+const panelTitle = computed(() => isEditMode.value ? '编辑拼车' : '发布拼车');
+const submitButtonText = computed(() => submitting.value ? '提交中...' : (isEditMode.value ? '保存修改' : '发布拼车'));
+
+// 监听 editData 变化，自动填充表单
+watch(() => props.editData, (newData) => {
+  if (newData) {
+    form.value = {
+      userId: newData.userId,
+      hasCar: newData.hasCar,
+      maxPassengerCount: newData.maxPassengerCount || 4,
+      passengerCount: newData.passengerCount || 1,
+      startLocation: newData.startLocation || '',
+      startLatitude: newData.startLatitude,
+      startLongitude: newData.startLongitude,
+      endLocation: newData.endLocation || '',
+      endLatitude: newData.endLatitude,
+      endLongitude: newData.endLongitude,
+      earliestDepartureTime: newData.earliestDepartureTime ? newData.earliestDepartureTime.slice(0, 16) : '',
+      latestDepartureTime: newData.latestDepartureTime ? newData.latestDepartureTime.slice(0, 16) : '',
+      phoneNumber: newData.phoneNumber || '',
+      statusDesc: newData.statusDesc || '寻找拼车'
+    };
+  }
+}, { immediate: true });
 
 const close = () => {
   emit('update:visible', false);
+  // 重置表单
+  if (!isEditMode.value) {
+    resetForm();
+  }
 };
 
 const toggle = () => {
   emit('update:visible', !props.visible);
+};
+
+const resetForm = () => {
+  form.value = {
+    userId: userStore.userId || null,
+    hasCar: true,
+    maxPassengerCount: 4,
+    passengerCount: 1,
+    startLocation: '',
+    startLatitude: null,
+    startLongitude: null,
+    endLocation: '',
+    endLatitude: null,
+    endLongitude: null,
+    earliestDepartureTime: '',
+    latestDepartureTime: '',
+    phoneNumber: '',
+    statusDesc: '寻找拼车'
+  };
 };
 
 // 提交表单
@@ -196,6 +248,9 @@ const submitForm = async () => {
   submitting.value = true;
 
   try {
+    console.log('CarpoolPanel - isEditMode:', isEditMode.value);
+    console.log('CarpoolPanel - editData:', props.editData);
+
     // 格式化时间，并根据hasCar设置maxPassengerCount
     const formData = {
       ...form.value,
@@ -204,16 +259,30 @@ const submitForm = async () => {
       latestDepartureTime: formatDateTime(form.value.latestDepartureTime)
     };
 
-    const response = await axios.post('http://localhost:8080/api/carpool/request', formData);
-    alert('发布成功！');
+    if (isEditMode.value) {
+      // 编辑模式：更新现有需求
+      console.log('CarpoolPanel - 发起更新请求，ID:', props.editData.id, '数据:', formData);
+      await axios.put(`http://localhost:8080/api/carpool/request/${props.editData.id}`, formData);
+      alert('修改成功！');
+    } else {
+      // 创建模式：发布新需求
+      console.log('CarpoolPanel - 发起创建请求，数据:', formData);
+      await axios.post('http://localhost:8080/api/carpool/request', formData);
+      alert('发布成功！');
+    }
+
     emit('submitted');
     close();
 
     // 重置表单
     resetForm();
   } catch (error) {
-    console.error('发布失败:', error);
-    alert(error.response?.data?.message || '发布失败，请稍后重试');
+    console.error(isEditMode.value ? '修改失败:' : '发布失败:', error);
+    if (error.response?.status === 403) {
+      alert(error.response?.data?.message || '您没有权限修改此拼车需求');
+    } else {
+      alert(error.response?.data?.message || (isEditMode.value ? '修改失败' : '发布失败') + '，请稍后重试');
+    }
   } finally {
     submitting.value = false;
   }
@@ -224,25 +293,6 @@ const formatDateTime = (dateTimeStr) => {
   if (!dateTimeStr) return '';
   // datetime-local 返回的是 yyyy-MM-ddTHH:mm 格式，需要转换为 yyyy-MM-dd HH:mm:ss
   return dateTimeStr.replace('T', ' ') + ':00';
-};
-
-const resetForm = () => {
-  form.value = {
-    userId: 1,
-    hasCar: true,
-    maxPassengerCount: 4,
-    passengerCount: 1,
-    startLocation: '',
-    startLatitude: null,
-    startLongitude: null,
-    endLocation: '',
-    endLatitude: null,
-    endLongitude: null,
-    earliestDepartureTime: '',
-    latestDepartureTime: '',
-    phoneNumber: '',
-    statusDesc: '寻找拼车'
-  };
 };
 </script>
 

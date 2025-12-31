@@ -86,6 +86,46 @@ public class CarpoolController {
     }
 
     /**
+     * 更新拼车需求
+     * PUT /api/carpool/request/{requestId}
+     */
+    @PutMapping("/request/{requestId}")
+    public ResponseEntity<?> updateRequest(
+            @PathVariable Long requestId,
+            @RequestBody CarpoolRequestDto dto,
+            @RequestHeader(value = "Authorization", required = false) String token) {
+        try {
+            // 验证token
+            if (token == null || !token.startsWith("Bearer ")) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                        .body(new ErrorResponse("未提供认证令牌"));
+            }
+
+            String jwt = token.substring(7);
+
+            // 验证token有效性
+            if (!jwtUtil.validateToken(jwt)) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                        .body(new ErrorResponse("无效的认证令牌"));
+            }
+
+            // 从token中获取用户ID
+            Long userId = jwtUtil.getUserIdFromToken(jwt);
+
+            // 更新需求
+            CarpoolRequest updatedRequest = carpoolService.updateRequest(requestId, userId, dto);
+
+            return ResponseEntity.ok(updatedRequest);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                    .body(new ErrorResponse(e.getMessage()));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(new ErrorResponse("更新拼车需求失败：" + e.getMessage()));
+        }
+    }
+
+    /**
      * 错误响应体
      */
     static class ErrorResponse {
