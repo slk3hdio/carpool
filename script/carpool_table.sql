@@ -22,7 +22,7 @@ CREATE TABLE match_record (
     request_id BIGINT NOT NULL COMMENT '请求ID',
     user_id BIGINT NOT NULL COMMENT '用户ID',
     trip_id BIGINT NOT NULL COMMENT '行程ID',
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP COMMENT '匹配时间',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP COMMENT '匹配时间'
 );
 
 CREATE TABLE trip_record (

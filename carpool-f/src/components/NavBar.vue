@@ -8,6 +8,7 @@
       <router-link to="/carpool" @click="closeMobileMenu">同城拼车</router-link>
       <!-- <router-link to="/demo" @click="closeMobileMenu">路况演示</router-link> -->
       <router-link to="/user" @click="closeMobileMenu">用户中心</router-link>
+      <router-link to="/log-dashboard" @click="closeMobileMenu">日志监控大屏</router-link>
     </div>
     <button class="mobile-menu-btn" @click="toggleMobileMenu" v-show="isMobile">
       <span></span>

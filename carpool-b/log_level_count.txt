@@ -1,0 +1,82 @@
+--- 日志等级统计Map ---
+INFO: 1985
+WARN: 76
+ERROR: 7
+DEBUG: 225
+TRACE: 0
+
+--- 启动耗时与关键阶段耗时 ---
+服务启动总耗时: 8.199 秒
+Root WebApplicationContext initialization: 1118 ms
+
+--- 数据库连接池（HikariCP）状态统计 ---
+连接创建次数: 18
+连接关闭次数: 0
+连接池启动次数: 18
+连接池关闭次数: 0
+连接相关异常/错误: 0
+
+--- QPS (每个Source) ---
+INFO: 0.00
+WARN: 0.00
+ERROR: 0.00
+DEBUG: 0.00
+TRACE: 0.00
+数据流量（B/s）：0.00
+
+--- 各包名日志数量 ---
+o.apache.catalina.core.StandardEngine: 17
+o.s.d.j.r.query.QueryEnhancerFactory: 18
+c.example.carpool.LogLevelCountRunner: 1294
+c.e.c.c.LogLevelCountController: 77
+o.h.c.internal.RegionFactoryInitiator: 18
+o.s.web.servlet.DispatcherServlet: 30
+j.LocalContainerEntityManagerFactoryBean: 18
+JpaWebConfiguration: 17
+c.e.carpool.CarpoolApplicationTests: 3
+o.s.b.d.a.OptionalLiveReloadServer: 17
+c.e.c.controller.TrafficController: 170
+org.hibernate.SQL: 173
+o.s.b.w.embedded.tomcat.TomcatWebServer: 34
+o.apache.catalina.core.StandardService: 17
+o.hibernate.jpa.internal.util.LogHelper: 18
+org.hibernate.orm.deprecation: 36
+org.hibernate.Version: 18
+org.hibernate.orm.connections.pooling: 18
+o.s.o.j.p.SpringPersistenceUnitInfo: 18
+w.s.c.ServletWebServerApplicationContext: 17
+com.zaxxer.hikari.HikariDataSource: 36
+.m.m.a.ExceptionHandlerExceptionResolver: 15
+WarningLoggingModifier: 8
+.e.DevToolsPropertyDefaultsPostProcessor: 34
+com.zaxxer.hikari.pool.HikariPool: 18
+com.example.carpool.CarpoolApplication: 68
+.s.d.r.c.RepositoryConfigurationDelegate: 36
+o.h.e.t.j.p.i.JtaPlatformInitiator: 18
+
+--- 异常类型统计 ---
+NullPointerException: 0
+IllegalArgumentException: 0
+IllegalStateException: 0
+IOException: 0
+SQLException: 0
+RuntimeException: 0
+ClassNotFoundException: 0
+NoSuchMethodException: 0
+IndexOutOfBoundsException: 0
+ArrayIndexOutOfBoundsException: 0
+NumberFormatException: 0
+FileNotFoundException: 0
+TimeoutException: 0
+ConnectException: 0
+SocketException: 0
+BindException: 0
+ArithmeticException: 0
+StackOverflowError: 0
+OutOfMemoryError: 0
+org.springframework.web.servlet.resource.NoResourceFoundException: 15
+
+--- 异常堆栈摘要（每种类型首例） ---
+org.springframework.web.servlet.resource.NoResourceFoundException:
+2026-01-02T01:35:50.208+08:00  WARN 18960 --- [carpool] [http-nio-8080-exec-1] .m.m.a.ExceptionHandlerExceptionResolver : Resolved [org.springframework.web.servlet.resource.NoResourceFoundException: No static resource log/level-count.]
+

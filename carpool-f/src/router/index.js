@@ -11,7 +11,14 @@ import Monitor from '../pages/Monitor.vue'
 import Login from '../pages/Login.vue'
 import Register from '../pages/Register.vue'
 
+import LogDashboard from '../pages/LogDashboard.vue'
+
 const routes = [
+  {
+    path: '/log-dashboard',
+    component: LogDashboard,
+    meta: { requiresAuth: false }
+  },
   {
     path: '/',
     component: Home,
