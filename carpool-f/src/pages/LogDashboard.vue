@@ -37,8 +37,12 @@
 				<div class="chart-title">日志等级统计</div>
 				<div ref="levelChart" class="chart-box"></div>
 				<div class="qps-panel">
-					<div class="chart-title" style="margin-bottom:0;">QPS & 数据流量</div>
+					<div class="chart-title" style="margin-bottom:0;">QPS (每秒查询率)</div>
 					<div ref="qpsChart" class="chart-box small"></div>
+				</div>
+				<div class="qps-panel">
+					<div class="chart-title" style="margin-bottom:0;">数据流量 (B/s)</div>
+					<div ref="trafficChart" class="chart-box small"></div>
 				</div>
 			</div>
 
@@ -59,7 +63,7 @@
 </template>
 
 <script setup>
-import { reactive, ref, onMounted } from 'vue';
+import { reactive, ref, onMounted, onUnmounted } from 'vue';
 import axios from 'axios';
 import * as echarts from 'echarts';
 
@@ -76,11 +80,32 @@ const pkgLogs = ref([]);
 const exceptions = ref([]);
 const exceptionTotal = ref(0);
 
+// 历史数据存储（最多保留60秒的数据）
+const MAX_DATA_POINTS = 10;
+const timeData = ref([]);
+const qpsHistoryData = reactive({
+  INFO: [],
+  WARN: [],
+  ERROR: [],
+  DEBUG: [],
+  TRACE: []
+});
+const trafficHistoryData = ref([]);
+
 const levelChart = ref(null);
 const pkgChart = ref(null);
 const exChart = ref(null);
 const dbChart = ref(null);
 const qpsChart = ref(null);
+const trafficChart = ref(null);
+
+let levelChartInst = null;
+let pkgChartInst = null;
+let exChartInst = null;
+let dbChartInst = null;
+let qpsChartInst = null;
+let trafficChartInst = null;
+let refreshTimer = null;
 
 function parseLogData(data) {
   // 清空之前的数据
@@ -185,132 +210,353 @@ function parseLogData(data) {
   exceptionTotal.value = exceptions.value.reduce((sum, e) => sum + e.value, 0);
 }
 
-onMounted(async () => {
+async function fetchDataAndUpdateCharts() {
 	try {
 		const get_url = 'http://localhost:8080/api/log/level-count';
 		const res = await axios.get(get_url);
-	  // 直接读取本地文件
-    // const res = await fetch('../../../carpool-b/log_level_count.txt');
-	const logData = res.data.content;
-	
-	console.log('=== 读取的文件数据 ===');
-	console.log(logData);
-	
-	parseLogData(logData);
-	console.log('=== 解析后的数据 ===');
-	console.log('logLevels:', logLevels);
-	console.log('metrics:', metrics);
-	console.log('qps:', qps);
-	console.log('traffic:', traffic.value);
-	console.log('pkgLogs:', pkgLogs.value);
-	console.log('exceptions:', exceptions.value);
-  } catch (e) {
-    console.error('=== 读取文件失败 ===');
-	console.error(e);
-  }
+		const logData = res.data.content;
+		
+		console.log('=== 读取的文件数据 ===');
+		console.log(logData);
+		
+		parseLogData(logData);
+		console.log('=== 解析后的数据 ===');
+		console.log('logLevels:', logLevels);
+		console.log('metrics:', metrics);
+		console.log('qps:', qps);
+		console.log('traffic:', traffic.value);
+		console.log('pkgLogs:', pkgLogs.value);
+		console.log('exceptions:', exceptions.value);
 
-	// QPS与数据流量折线图
-			const qpsChartInst = echarts.init(qpsChart.value);
-			qpsChartInst.setOption({
-				tooltip: { trigger: 'axis' },
-				legend: { data: ['QPS', '数据流量(B/s)'], top: 0, textStyle: { color: '#b0b8d0' } },
-				grid: { left: 40, right: 20, top: 30, bottom: 30 },
-				xAxis: {
-					type: 'category',
-					data: ['INFO', 'WARN', 'ERROR', 'DEBUG', 'TRACE'],
-					axisLabel: { color: '#b0b8d0', fontSize: 13 }
-				},
-				yAxis: [
-					{
-						type: 'value',
-						name: 'QPS',
-						min: 0,
-						axisLabel: { color: '#b0b8d0', fontSize: 13 },
-						splitLine: { show: false }
-					},
-					{
-						type: 'value',
-						name: '数据流量(B/s)',
-						min: 0,
-						axisLabel: { color: '#b0b8d0', fontSize: 13 },
-						splitLine: { show: false }
-					}
-				],
-				series: [
-					{
-						name: 'QPS',
-						type: 'line',
-						data: [qps.INFO, qps.WARN, qps.ERROR, qps.DEBUG, qps.TRACE],
-						yAxisIndex: 0,
-						smooth: true,
-						symbol: 'circle',
-						symbolSize: 10,
-						lineStyle: { color: '#4fd7ff', width: 3 },
-						itemStyle: { color: '#4fd7ff' },
-						label: { show: true, color: '#fff', fontWeight: 'bold' }
-					},
-					{
-						name: '数据流量(B/s)',
-						type: 'line',
-						data: [traffic.value, 0, 0, 0, 0],
-						yAxisIndex: 1,
-						smooth: true,
-						symbol: 'rect',
-						symbolSize: 10,
-						lineStyle: { color: '#ffb74d', width: 3, type: 'dashed' },
-						itemStyle: { color: '#ffb74d' },
-						label: { show: true, color: '#fff', fontWeight: 'bold' }
-					}
-				]
-			});
-		// 数据库连接池纵向柱状图
-		const dbChartInst = echarts.init(dbChart.value);
-		dbChartInst.setOption({
-			tooltip: {
-				trigger: 'axis',
-				axisPointer: { type: 'shadow' },
-				formatter: params => {
-					return params.map(p => `${p.name}: <b>${p.value}</b>`).join('<br/>');
-				}
-			},
-			grid: { left: 20, right: 20, top: 20, bottom: 30 },
+		// 添加当前时间点的数据到历史记录
+		const now = new Date();
+		const timeStr = `${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}:${now.getSeconds().toString().padStart(2, '0')}`;
+		
+		timeData.value.push(timeStr);
+		qpsHistoryData.INFO.push(qps.INFO);
+		qpsHistoryData.WARN.push(qps.WARN);
+		qpsHistoryData.ERROR.push(qps.ERROR);
+		qpsHistoryData.DEBUG.push(qps.DEBUG);
+		qpsHistoryData.TRACE.push(qps.TRACE);
+		trafficHistoryData.value.push(traffic.value);
+
+		// 保持数据点数量不超过MAX_DATA_POINTS
+		if (timeData.value.length > MAX_DATA_POINTS) {
+			timeData.value.shift();
+			qpsHistoryData.INFO.shift();
+			qpsHistoryData.WARN.shift();
+			qpsHistoryData.ERROR.shift();
+			qpsHistoryData.DEBUG.shift();
+			qpsHistoryData.TRACE.shift();
+			trafficHistoryData.value.shift();
+		}
+
+		// 更新所有图表
+		updateCharts();
+	} catch (e) {
+		console.error('=== 读取文件失败 ===');
+		console.error(e);
+	}
+}
+
+function updateCharts() {
+	// QPS折线图 - 时间序列图
+	if (qpsChartInst) {
+		qpsChartInst.setOption({
 			xAxis: {
-				type: 'category',
-				data: ['连接创建', '连接关闭', '池启动', '池关闭', '异常'],
-				axisLabel: { color: '#b0b8d0', fontSize: 13 }
-			},
-			yAxis: {
-				type: 'value',
-				axisLabel: { color: '#b0b8d0', fontSize: 13 },
-				splitLine: { show: false }
+				data: timeData.value
 			},
 			series: [
 				{
-					name: '次数',
-					type: 'bar',
-					data: [metrics.db.create, metrics.db.close, metrics.db.poolStart, metrics.db.poolClose, metrics.db.error],
-					barWidth: 22,
-					itemStyle: {
-						color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
-							{ offset: 0, color: '#4fd7ff' },
-							{ offset: 1, color: '#1e88e5' }
-						])
-					},
-					label: {
-						show: true,
-						position: 'top',
-						color: '#fff',
-						fontWeight: 'bold',
-						fontSize: 14
-					},
-					emphasis: {
-						itemStyle: { color: '#ffb74d' }
-					}
+					name: 'INFO QPS',
+					data: qpsHistoryData.INFO
+				},
+				{
+					name: 'WARN QPS',
+					data: qpsHistoryData.WARN
+				},
+				{
+					name: 'ERROR QPS',
+					data: qpsHistoryData.ERROR
+				},
+				{
+					name: 'DEBUG QPS',
+					data: qpsHistoryData.DEBUG
+				},
+				{
+					name: 'TRACE QPS',
+					data: qpsHistoryData.TRACE
 				}
 			]
 		});
+	}
+
+	// 数据流量折线图 - 时间序列图
+	if (trafficChartInst) {
+		trafficChartInst.setOption({
+			xAxis: {
+				data: timeData.value
+			},
+			series: [
+				{
+					data: trafficHistoryData.value
+				}
+			]
+		});
+	}
+
+	// 数据库连接池纵向柱状图
+	if (dbChartInst) {
+		dbChartInst.setOption({
+			series: [
+				{
+					data: [metrics.db.create, metrics.db.close, metrics.db.poolStart, metrics.db.poolClose, metrics.db.error]
+				}
+			]
+		});
+	}
+
 	// 日志等级统计图
-	const levelChartInst = echarts.init(levelChart.value);
+	if (levelChartInst) {
+		levelChartInst.setOption({
+			xAxis: { data: Object.keys(logLevels) },
+			series: [
+				{
+					data: Object.values(logLevels)
+				}
+			]
+		});
+	}
+
+	// 包名日志数量排行
+	if (pkgChartInst) {
+		const pkgTop = pkgLogs.value.slice(0, 10).sort((a, b) => b.value - a.value);
+		pkgChartInst.setOption({
+			yAxis: {
+				data: pkgTop.map(i => i.name)
+			},
+			series: [
+				{
+					data: pkgTop.map(i => i.value)
+				}
+			]
+		});
+	}
+
+	// 异常类型统计
+	if (exChartInst) {
+		exChartInst.setOption({
+			series: [
+				{
+					data: exceptions.value.filter(e => e.value > 0)
+				}
+			]
+		});
+	}
+}
+
+onMounted(async () => {
+// 初始化QPS图表实例
+	qpsChartInst = echarts.init(qpsChart.value);
+	qpsChartInst.setOption({
+		tooltip: { 
+			trigger: 'axis',
+			axisPointer: {
+				type: 'cross',
+				label: {
+					backgroundColor: '#6a7985'
+				}
+			}
+		},
+		legend: { 
+			data: ['INFO QPS', 'WARN QPS', 'ERROR QPS', 'DEBUG QPS', 'TRACE QPS'], 
+			top: 0, 
+			textStyle: { color: '#b0b8d0', fontSize: 12 }
+		},
+		grid: { left: 50, right: 50, top: 40, bottom: 30 },
+		xAxis: {
+			type: 'category',
+			boundaryGap: false,
+			data: timeData.value,
+			axisLabel: { 
+				color: '#b0b8d0', 
+				fontSize: 11,
+				rotate: 30
+			},
+			axisLine: { lineStyle: { color: '#3a4a6a' } }
+		},
+		yAxis: {
+			type: 'value',
+			name: 'QPS',
+			axisLabel: { color: '#b0b8d0', fontSize: 12 },
+			axisLine: { lineStyle: { color: '#3a4a6a' } },
+			splitLine: { lineStyle: { color: '#2a3a5a', type: 'dashed' } }
+		},
+		series: [
+			{
+				name: 'INFO QPS',
+				type: 'line',
+				data: qpsHistoryData.INFO,
+				smooth: true,
+				symbol: 'circle',
+				symbolSize: 6,
+				lineStyle: { color: '#4fd7ff', width: 2 },
+				itemStyle: { color: '#4fd7ff' },
+				areaStyle: {
+					color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+						{ offset: 0, color: 'rgba(79, 215, 255, 0.3)' },
+						{ offset: 1, color: 'rgba(79, 215, 255, 0.05)' }
+					])
+				}
+			},
+			{
+				name: 'WARN QPS',
+				type: 'line',
+				data: qpsHistoryData.WARN,
+				smooth: true,
+				symbol: 'circle',
+				symbolSize: 6,
+				lineStyle: { color: '#ffb74d', width: 2 },
+				itemStyle: { color: '#ffb74d' }
+			},
+			{
+				name: 'ERROR QPS',
+				type: 'line',
+				data: qpsHistoryData.ERROR,
+				smooth: true,
+				symbol: 'circle',
+				symbolSize: 6,
+				lineStyle: { color: '#ff4d4f', width: 2 },
+				itemStyle: { color: '#ff4d4f' }
+			},
+			{
+				name: 'DEBUG QPS',
+				type: 'line',
+				data: qpsHistoryData.DEBUG,
+				smooth: true,
+				symbol: 'circle',
+				symbolSize: 6,
+				lineStyle: { color: '#81c784', width: 2 },
+				itemStyle: { color: '#81c784' }
+			},
+			{
+				name: 'TRACE QPS',
+				type: 'line',
+				data: qpsHistoryData.TRACE,
+				smooth: true,
+				symbol: 'circle',
+				symbolSize: 6,
+				lineStyle: { color: '#9575cd', width: 2 },
+				itemStyle: { color: '#9575cd' }
+			}
+		]
+		});
+
+	// 初始化数据流量图表实例
+	trafficChartInst = echarts.init(trafficChart.value);
+	trafficChartInst.setOption({
+		tooltip: { 
+			trigger: 'axis',
+			axisPointer: {
+				type: 'cross',
+				label: {
+					backgroundColor: '#6a7985'
+				}
+			}
+		},
+		legend: { 
+			data: ['数据流量'], 
+			top: 0, 
+			textStyle: { color: '#b0b8d0', fontSize: 12 }
+		},
+		grid: { left: 50, right: 50, top: 40, bottom: 30 },
+		xAxis: {
+			type: 'category',
+			boundaryGap: false,
+			data: timeData.value,
+			axisLabel: { 
+				color: '#b0b8d0', 
+				fontSize: 11,
+				rotate: 30
+			},
+			axisLine: { lineStyle: { color: '#3a4a6a' } }
+		},
+		yAxis: {
+			type: 'value',
+			name: 'B/s',
+			axisLabel: { color: '#b0b8d0', fontSize: 12 },
+			axisLine: { lineStyle: { color: '#3a4a6a' } },
+			splitLine: { lineStyle: { color: '#2a3a5a', type: 'dashed' } }
+		},
+		series: [
+			{
+				name: '数据流量',
+				type: 'line',
+				data: trafficHistoryData.value,
+				smooth: true,
+				symbol: 'diamond',
+				symbolSize: 8,
+				lineStyle: { color: '#ffd700', width: 3 },
+				itemStyle: { color: '#ffd700' },
+				areaStyle: {
+					color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+						{ offset: 0, color: 'rgba(255, 215, 0, 0.3)' },
+						{ offset: 1, color: 'rgba(255, 215, 0, 0.05)' }
+					])
+				}
+			}
+		]
+	});
+
+	// 数据库连接池纵向柱状图
+	dbChartInst = echarts.init(dbChart.value);
+	dbChartInst.setOption({
+		tooltip: {
+			trigger: 'axis',
+			axisPointer: { type: 'shadow' },
+			formatter: params => {
+				return params.map(p => `${p.name}: <b>${p.value}</b>`).join('<br/>');
+			}
+		},
+		grid: { left: 20, right: 20, top: 20, bottom: 30 },
+		xAxis: {
+			type: 'category',
+			data: ['连接创建', '连接关闭', '池启动', '池关闭', '异常'],
+			axisLabel: { color: '#b0b8d0', fontSize: 13 }
+		},
+		yAxis: {
+			type: 'value',
+			axisLabel: { color: '#b0b8d0', fontSize: 13 },
+			splitLine: { show: false }
+		},
+		series: [
+			{
+				name: '次数',
+				type: 'bar',
+				data: [metrics.db.create, metrics.db.close, metrics.db.poolStart, metrics.db.poolClose, metrics.db.error],
+				barWidth: 22,
+				itemStyle: {
+					color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+						{ offset: 0, color: '#4fd7ff' },
+						{ offset: 1, color: '#1e88e5' }
+					])
+				},
+				label: {
+					show: true,
+					position: 'top',
+					color: '#fff',
+					fontWeight: 'bold',
+					fontSize: 14
+				},
+				emphasis: {
+					itemStyle: { color: '#ffb74d' }
+				}
+			}
+		]
+	});
+
+	// 日志等级统计图
+	levelChartInst = echarts.init(levelChart.value);
 	levelChartInst.setOption({
 		tooltip: {},
 		xAxis: { type: 'category', data: Object.keys(logLevels) },
@@ -322,19 +568,12 @@ onMounted(async () => {
 				data: Object.values(logLevels),
 				itemStyle: { color: '#4fd7ff' },
 			},
-			{
-				name: '日志数量趋势',
-				type: 'line',
-				data: Object.values(logLevels),
-				smooth: true,
-				lineStyle: { color: '#ffb74d' },
-			},
 		],
 		grid: { top: 40, right: 20, left: 40, bottom: 40 },
 	});
 
 	// 包名日志数量排行（横向美观优化）
-	const pkgChartInst = echarts.init(pkgChart.value);
+	pkgChartInst = echarts.init(pkgChart.value);
 	const pkgTop = pkgLogs.value.slice(0, 10).sort((a, b) => b.value - a.value);
 	pkgChartInst.setOption({
 		tooltip: {
@@ -393,7 +632,7 @@ onMounted(async () => {
 	});
 
 	// 异常类型统计
-	const exChartInst = echarts.init(exChart.value);
+	exChartInst = echarts.init(exChart.value);
 	exChartInst.setOption({
 		tooltip: {},
 		series: [
@@ -407,6 +646,30 @@ onMounted(async () => {
 			},
 		],
 	});
+
+	// 首次加载数据
+	await fetchDataAndUpdateCharts();
+
+	// 设置定时器每秒刷新
+	refreshTimer = setInterval(() => {
+		fetchDataAndUpdateCharts();
+	}, 1000);
+});
+
+onUnmounted(() => {
+	// 清除定时器
+	if (refreshTimer) {
+		clearInterval(refreshTimer);
+		refreshTimer = null;
+	}
+
+	// 销毁图表实例
+	if (levelChartInst) levelChartInst.dispose();
+	if (pkgChartInst) pkgChartInst.dispose();
+	if (exChartInst) exChartInst.dispose();
+	if (dbChartInst) dbChartInst.dispose();
+	if (qpsChartInst) qpsChartInst.dispose();
+	if (trafficChartInst) trafficChartInst.dispose();
 });
 </script>
 

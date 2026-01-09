@@ -7,7 +7,6 @@ import Carpool from '../pages/Carpool.vue'
 import User from '../pages/User.vue'
 import RoadDemo from '../pages/RoadDemo.vue'
 import HistoricalTraffic from '../pages/HistoricalTraffic.vue'
-import Monitor from '../pages/Monitor.vue'
 import Login from '../pages/Login.vue'
 import Register from '../pages/Register.vue'
 
@@ -47,11 +46,6 @@ const routes = [
   {
     path: '/historical',
     component: HistoricalTraffic,
-    meta: { requiresAuth: false }
-  },
-  {
-    path: '/monitor',
-    component: Monitor,
     meta: { requiresAuth: false }
   },
   {

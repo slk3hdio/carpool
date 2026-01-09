@@ -15,10 +15,10 @@ public class LogLevelCountRunner implements ApplicationRunner {
     @Override
     public void run(ApplicationArguments args) throws Exception {
          new Thread(() -> {
-            // 每隔5秒钟执行一次日志统计
+            // 每隔1秒钟执行一次日志统计
             try {
                 while (true) {
-                    Thread.sleep(5000);
+                    Thread.sleep(1000);
                     // System.out.println("===================================");
                     // System.out.println("开始统计日志等级...");
                     // logger.info("开始统计日志等级...");
@@ -34,6 +34,5 @@ public class LogLevelCountRunner implements ApplicationRunner {
             }
         }).start();
     
-        System.out.println("hello world.");
     }
 }

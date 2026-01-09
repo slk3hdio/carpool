@@ -1,4 +1,3 @@
-        // ...existing code...
 package com.example.carpool.util;
 
 import java.io.*;
@@ -182,13 +181,13 @@ public class LogLevelCountLocal {
         for (String level : levels) {
             int now = sourceCount.get(level);
             int last = lastSourceCount.getOrDefault(level, 0);
-            double qps = (now - last) / 5.0;
+                double qps = (now - last) / 1.0;
             qpsMap.put(level, qps);
         }
 
         // 计算数据流量（B/s）
         long bytesDelta = totalBytes - lastTotalBytes;
-        double bytesPerSecond = bytesDelta / 5.0;
+            double bytesPerSecond = bytesDelta / 1.0;
 
         // 保存本次Source计数和字节数
         try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(qpsStateFile))) {
