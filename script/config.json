@@ -7,7 +7,7 @@
     "charset": "utf8mb4"
   },
   "baidu_api": {
-    "ak": "YOUR_BAIDU_API_KEY_HERE"
+    "ak": "MU5oUiBPhetOfK4EO62VrIgxtM3gw4EI"
   },
   "roads": [
     {"road_name": "四平路", "city": "上海市"},
