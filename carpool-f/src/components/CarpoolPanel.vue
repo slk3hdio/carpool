@@ -262,12 +262,12 @@ const submitForm = async () => {
     if (isEditMode.value) {
       // 编辑模式：更新现有需求
       console.log('CarpoolPanel - 发起更新请求，ID:', props.editData.id, '数据:', formData);
-      await axios.put(`http://localhost:8080/api/carpool/request/${props.editData.id}`, formData);
+      await axios.put(`http://47.100.65.234/api/carpool/request/${props.editData.id}`, formData);
       alert('修改成功！');
     } else {
       // 创建模式：发布新需求
       console.log('CarpoolPanel - 发起创建请求，数据:', formData);
-      await axios.post('http://localhost:8080/api/carpool/request', formData);
+      await axios.post('http://47.100.65.234/api/carpool/request', formData);
       alert('发布成功！');
     }
 

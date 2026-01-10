@@ -518,7 +518,7 @@ function parseLogData(data) {
 
 async function fetchDataAndUpdateCharts() {
 	try {
-		const get_url = 'http://localhost:8080/api/log/level-count';
+		const get_url = 'http://47.100.65.234/api/log/level-count';
 		const res = await axios.get(get_url);
 		const logData = res.data.content;
 		

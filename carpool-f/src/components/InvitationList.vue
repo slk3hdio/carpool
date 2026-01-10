@@ -139,14 +139,14 @@ export default {
 
         if (this.carpoolRequestId) {
           // 获取某个拼车需求的邀请（需求发布者查看）
-          url = `http://localhost:8080/api/carpool/invitation/request/${this.carpoolRequestId}`;
+          url = `http://47.100.65.234/api/carpool/invitation/request/${this.carpoolRequestId}`;
         } else if (this.userId) {
           if (this.received) {
             // 获取用户收到的邀请（别人向用户发布的拼车需求发送的邀请）
-            url = `http://localhost:8080/api/carpool/invitation/received/${this.userId}`;
+            url = `http://47.100.65.234/api/carpool/invitation/received/${this.userId}`;
           } else {
             // 获取用户发起的邀请（用户自己查看）
-            url = `http://localhost:8080/api/carpool/invitation/inviter/${this.userId}`;
+            url = `http://47.100.65.234/api/carpool/invitation/inviter/${this.userId}`;
           }
         } else {
           throw new Error('必须提供 carpoolRequestId 或 userId');

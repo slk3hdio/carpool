@@ -40,7 +40,7 @@ export const useUserStore = defineStore('user', {
     // 登录
     async login(credentials) {
       try {
-        const response = await axios.post('http://localhost:8080/api/auth/login', credentials);
+        const response = await axios.post('http://47.100.65.234/api/auth/login', credentials);
 
         if (response.data.token) {
           this.setUser(response.data.user, response.data.token);
@@ -57,7 +57,7 @@ export const useUserStore = defineStore('user', {
     // 注册
     async register(userData) {
       try {
-        const response = await axios.post('http://localhost:8080/api/auth/register', userData);
+        const response = await axios.post('http://47.100.65.234/api/auth/register', userData);
         return response.data;
       } catch (error) {
         console.error('Register error:', error);
@@ -72,7 +72,7 @@ export const useUserStore = defineStore('user', {
       }
 
       try {
-        const response = await axios.get('http://localhost:8080/api/auth/me');
+        const response = await axios.get('http://47.100.65.234/api/auth/me');
 
         if (response.data) {
           this.user = response.data;

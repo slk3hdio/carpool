@@ -113,7 +113,7 @@ export default {
       this.processing = true;
 
       try {
-        await axios.put(`http://localhost:8080/api/carpool/invitation/${this.invitation.id}/accept`);
+        await axios.put(`http://47.100.65.234/api/carpool/invitation/${this.invitation.id}/accept`);
         this.$message?.success('已接受邀请');
         this.$emit('updated');
       } catch (error) {
@@ -134,7 +134,7 @@ export default {
       this.processing = true;
 
       try {
-        await axios.put(`http://localhost:8080/api/carpool/invitation/${this.invitation.id}/reject`);
+        await axios.put(`http://47.100.65.234/api/carpool/invitation/${this.invitation.id}/reject`);
         this.$message?.success('已拒绝邀请');
         this.$emit('updated');
       } catch (error) {

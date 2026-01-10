@@ -217,7 +217,7 @@ export default {
       }
 
       try {
-        await axios.put(`http://localhost:8080/api/trip/${this.trip.id}/cancel`, {}, {
+        await axios.put(`http://47.100.65.234/api/trip/${this.trip.id}/cancel`, {}, {
           headers: {
             'Authorization': `Bearer ${this.userStore.token}`
           }

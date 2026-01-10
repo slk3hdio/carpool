@@ -242,7 +242,7 @@ const fetchTrips = async () => {
 
   loadingTrips.value = true;
   try {
-    const response = await axios.get('http://localhost:8080/api/trip/user', {
+    const response = await axios.get('http://47.100.65.234/api/trip/user', {
       headers: {
         'Authorization': `Bearer ${userStore.token}`
       }
@@ -268,7 +268,7 @@ const fetchMyRequests = async () => {
 
   loadingRequests.value = true;
   try {
-    const response = await axios.get('http://localhost:8080/api/carpool/my-requests', {
+    const response = await axios.get('http://47.100.65.234/api/carpool/my-requests', {
       headers: {
         'Authorization': `Bearer ${userStore.token}`
       }

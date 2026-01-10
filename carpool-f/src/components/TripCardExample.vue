@@ -68,7 +68,7 @@ export default {
       this.loading = true
       try {
         // 获取当前用户的所有行程
-        const response = await axios.get('http://localhost:8080/api/trip/user', {
+        const response = await axios.get('http://47.100.65.234/api/trip/user', {
           headers: {
             'Authorization': `Bearer ${localStorage.getItem('token')}`
           }
@@ -121,7 +121,7 @@ export default {
     async handleCancelTrip(trip) {
       console.log('取消行程:', trip)
       try {
-        await axios.put(`http://localhost:8080/api/trip/${trip.id}/cancel`, {}, {
+        await axios.put(`http://47.100.65.234/api/trip/${trip.id}/cancel`, {}, {
           headers: {
             'Authorization': `Bearer ${localStorage.getItem('token')}`
           }

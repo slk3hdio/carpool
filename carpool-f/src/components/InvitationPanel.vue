@@ -191,7 +191,7 @@ const submitForm = async () => {
       message: form.value.message
     };
 
-    const response = await axios.post('http://localhost:8080/api/carpool/invitation', formData);
+    const response = await axios.post('http://47.100.65.234/api/carpool/invitation', formData);
     alert('邀请发送成功！');
     emit('submitted', response.data);
     close();
