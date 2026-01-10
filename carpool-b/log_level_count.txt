@@ -1,20 +1,20 @@
 --- 日志等级统计Map ---
-INFO: 760
-WARN: 7
-ERROR: 0
-DEBUG: 29
+INFO: 839
+WARN: 30
+ERROR: 3
+DEBUG: 33
 TRACE: 0
 
 --- 启动耗时与关键阶段耗时 ---
-服务启动总耗时: 17.886 秒
-Root WebApplicationContext initialization: 3817 ms
+服务启动总耗时: 26.184 秒
+Root WebApplicationContext initialization: 4645 ms
 
 --- 数据库连接池（HikariCP）状态统计 ---
-连接创建次数: 2
+连接创建次数: 3
 连接关闭次数: 0
-连接池启动次数: 2
+连接池启动次数: 3
 连接池关闭次数: 0
-连接相关异常/错误: 0
+连接相关异常/错误: 8
 
 --- QPS (每个Source) ---
 INFO: 0.00
@@ -25,31 +25,36 @@ TRACE: 0.00
 数据流量（B/s）：0.00
 
 --- 各包名日志数量 ---
-o.apache.catalina.core.StandardEngine: 2
-o.s.d.j.r.query.QueryEnhancerFactory: 2
+o.apache.catalina.core.StandardEngine: 4
+o.s.d.j.r.query.QueryEnhancerFactory: 6
 c.e.c.c.LogLevelCountController: 696
-o.h.c.internal.RegionFactoryInitiator: 2
+o.h.c.internal.RegionFactoryInitiator: 6
 o.s.web.servlet.DispatcherServlet: 4
-j.LocalContainerEntityManagerFactoryBean: 2
-JpaWebConfiguration: 2
-o.s.b.d.a.OptionalLiveReloadServer: 2
+j.LocalContainerEntityManagerFactoryBean: 8
+JpaWebConfiguration: 5
+c.e.carpool.CarpoolApplicationTests: 7
+o.s.b.d.a.OptionalLiveReloadServer: 4
+o.h.e.j.e.i.JdbcEnvironmentInitiator: 3
+o.s.b.w.e.tomcat.GracefulShutdown: 2
 c.e.c.controller.TrafficController: 10
 org.hibernate.SQL: 25
-o.s.b.w.embedded.tomcat.TomcatWebServer: 4
-o.apache.catalina.core.StandardService: 2
-o.hibernate.jpa.internal.util.LogHelper: 2
-org.hibernate.orm.deprecation: 4
-org.hibernate.Version: 2
-org.hibernate.orm.connections.pooling: 2
-o.s.o.j.p.SpringPersistenceUnitInfo: 2
-w.s.c.ServletWebServerApplicationContext: 2
-com.zaxxer.hikari.HikariDataSource: 4
+com.zaxxer.hikari.pool.PoolBase: 5
+o.s.b.w.embedded.tomcat.TomcatWebServer: 8
+o.apache.catalina.core.StandardService: 4
+o.hibernate.jpa.internal.util.LogHelper: 6
+o.h.engine.jdbc.spi.SqlExceptionHelper: 6
+org.hibernate.orm.deprecation: 12
+org.hibernate.Version: 6
+org.hibernate.orm.connections.pooling: 6
+o.s.o.j.p.SpringPersistenceUnitInfo: 6
+w.s.c.ServletWebServerApplicationContext: 4
+com.zaxxer.hikari.HikariDataSource: 9
 WarningLoggingModifier: 1
-.e.DevToolsPropertyDefaultsPostProcessor: 4
-com.zaxxer.hikari.pool.HikariPool: 2
-com.example.carpool.CarpoolApplication: 8
-.s.d.r.c.RepositoryConfigurationDelegate: 4
-o.h.e.t.j.p.i.JtaPlatformInitiator: 2
+.e.DevToolsPropertyDefaultsPostProcessor: 8
+com.zaxxer.hikari.pool.HikariPool: 4
+com.example.carpool.CarpoolApplication: 16
+.s.d.r.c.RepositoryConfigurationDelegate: 12
+o.h.e.t.j.p.i.JtaPlatformInitiator: 6
 
 --- 异常类型统计 ---
 NullPointerException: 0
@@ -71,5 +76,37 @@ BindException: 0
 ArithmeticException: 0
 StackOverflowError: 0
 OutOfMemoryError: 0
+org.hibernate.exception.SQLGrammarException: 1
+com.mysql.cj.exceptions.CJCommunicationsException: 2
+java.sql.SQLSyntaxErrorException: 1
+java.net.ConnectException: 2
+org.hibernate.exception.JDBCConnectionException: 2
+com.mysql.cj.jdbc.exceptions.CommunicationsException: 2
 
 --- 异常堆栈摘要（每种类型首例） ---
+com.mysql.cj.exceptions.CJCommunicationsException:
+Caused by: com.mysql.cj.exceptions.CJCommunicationsException: Communications link failure
+
+
+java.sql.SQLSyntaxErrorException:
+Caused by: java.sql.SQLSyntaxErrorException: Unknown database 'carpool'
+	at com.mysql.cj.jdbc.exceptions.SQLError.createSQLException(SQLError.java:112) ~[mysql-connector-j-9.4.0.jar:9.4.0]
+	at com.mysql.cj.jdbc.exceptions.SQLExceptionsMapping.translateException(SQLExceptionsMapping.java:114) ~[mysql-connector-j-9.4.0.jar:9.4.0]
+	at com.mysql.cj.jdbc.ConnectionImpl.createNewIO(ConnectionImpl.java:839) ~[mysql-connector-j-9.4.0.jar:9.4.0]
+	at com.mysql.cj.jdbc.ConnectionImpl.<init>(ConnectionImpl.java:415) ~[mysql-connector-j-9.4.0.jar:9.4.0]
+
+java.net.ConnectException:
+Caused by: java.net.ConnectException: Connection refused
+	at java.base/sun.nio.ch.Net.pollConnect(Native Method) ~[na:na]
+	at java.base/sun.nio.ch.Net.pollConnectNow(Net.java:682) ~[na:na]
+	at java.base/sun.nio.ch.NioSocketImpl.timedFinishConnect(NioSocketImpl.java:542) ~[na:na]
+	at java.base/sun.nio.ch.NioSocketImpl.connect(NioSocketImpl.java:592) ~[na:na]
+
+org.hibernate.exception.JDBCConnectionException:
+org.hibernate.exception.JDBCConnectionException: unable to obtain isolated JDBC connection [Communications link failure
+
+
+com.mysql.cj.jdbc.exceptions.CommunicationsException:
+Caused by: com.mysql.cj.jdbc.exceptions.CommunicationsException: Communications link failure
+
+

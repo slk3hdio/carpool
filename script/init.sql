@@ -144,13 +144,5 @@ CREATE TABLE IF NOT EXISTS match_record (
 -- Create a demo user (password: demo123, hashed with BCrypt)
 -- Note: This is a demo user. Remove this in production!
 INSERT INTO users (username, password, phone_number, email, real_name, status)
-VALUES ('demo', '$2a$10$N9qo8uLOickgx2ZMRZoMye.IKN/6j7xqG7vGJ7xG7vGJ7xGJ7xGJ', '13800138000', 'demo@example.com', 'Demo User', 1)
+VALUES ('demo', '$demo123', '13800138000', 'demo@example.com', 'Demo User', 1)
 ON DUPLICATE KEY UPDATE username=username;
-
--- ============================================
--- Privileges
--- ============================================
-
--- Grant privileges to carpool user
-GRANT ALL PRIVILEGES ON carpool.* TO 'carpool'@'%';
-FLUSH PRIVILEGES;
