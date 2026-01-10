@@ -1,0 +1,30 @@
+{
+  "database": {
+    "host": "mysql",
+    "user": "carpool",
+    "password": "carpool_password",
+    "database": "carpool",
+    "charset": "utf8mb4"
+  },
+  "baidu_api": {
+    "ak": "YOUR_BAIDU_API_KEY_HERE"
+  },
+  "roads": [
+    {"road_name": "四平路", "city": "上海市"},
+    {"road_name": "中山北二路", "city": "上海市"},
+    {"road_name": "国权路", "city": "上海市"},
+    {"road_name": "彰武路", "city": "上海市"},
+    {"road_name": "汶水东路", "city": "上海市"},
+    {"road_name": "海伦路", "city": "上海市"},
+    {"road_name": "淞沪路", "city": "上海市"},
+    {"road_name": "中环路", "city": "上海市"},
+    {"road_name": "赤峰路", "city": "上海市"},
+    {"road_name": "浙江中路", "city": "上海市"},
+    {"road_name": "昌吉东路", "city": "上海市"},
+    {"road_name": "嘉松北路", "city": "上海市"}
+  ],
+  "schedule": {
+    "collection_interval_seconds": 300,
+    "request_interval_seconds": 2
+  }
+}

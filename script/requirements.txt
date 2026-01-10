@@ -1,0 +1,11 @@
+# HTTP 请求库
+requests==2.31.0
+
+# MySQL 数据库驱动
+pymysql==1.1.0
+
+# Python 标准库（不需要安装）
+# - logging
+# - datetime
+# - time
+# - json
