@@ -1,0 +1,26 @@
+--- 异常类型统计 ---
+ArithmeticException: 1
+StackOverflowError: 1
+OutOfMemoryError: 1
+NullPointerException: 0
+IllegalArgumentException: 0
+IOException: 0
+SQLException: 0
+RuntimeException: 0
+
+--- 异常堆栈摘要（每种类型首例） ---
+ArithmeticException:
+java.lang.ArithmeticException: / by zero
+	at com.example.TestApp.divide(TestApp.java:80)
+	at com.example.TestApp.main(TestApp.java:18)
+
+StackOverflowError:
+java.lang.StackOverflowError
+	at com.example.TestApp.recursive(TestApp.java:90)
+	at com.example.TestApp.recursive(TestApp.java:90)
+	at com.example.TestApp.recursive(TestApp.java:90)
+
+OutOfMemoryError:
+java.lang.OutOfMemoryError: Java heap space
+	at com.example.TestApp.allocate(TestApp.java:100)
+	at com.example.TestApp.main(TestApp.java:19)

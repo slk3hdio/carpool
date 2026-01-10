@@ -1,0 +1,25 @@
+--- 异常类型统计 ---
+IOException: 1
+SQLException: 2
+IndexOutOfBoundsException: 1
+NullPointerException: 0
+IllegalArgumentException: 0
+RuntimeException: 0
+StackOverflowError: 0
+OutOfMemoryError: 0
+
+--- 异常堆栈摘要（每种类型首例） ---
+IOException:
+java.io.IOException: Disk not found
+	at com.example.TestApp.readFile(TestApp.java:50)
+	at com.example.TestApp.main(TestApp.java:15)
+
+SQLException:
+java.sql.SQLException: DB error
+	at com.example.TestApp.queryDb(TestApp.java:60)
+	at com.example.TestApp.main(TestApp.java:16)
+
+IndexOutOfBoundsException:
+java.lang.IndexOutOfBoundsException: Index 5 out of bounds
+	at com.example.TestApp.getList(TestApp.java:70)
+	at com.example.TestApp.main(TestApp.java:17)

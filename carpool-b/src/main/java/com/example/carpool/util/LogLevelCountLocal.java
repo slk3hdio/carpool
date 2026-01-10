@@ -242,6 +242,5 @@ public class LogLevelCountLocal {
                 pw.printf("%s:\n%s\n", entry.getKey(), entry.getValue());
             }
         }
-        // System.out.println("统计完成，结果已写入 " + outFile);
     }
 }

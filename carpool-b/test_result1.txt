@@ -1,0 +1,18 @@
+--- 异常堆栈摘要（每种类型首例） ---
+NullPointerException:
+java.lang.NullPointerException: Something is null
+	at com.example.TestApp.main(TestApp.java:10)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:77)
+	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:568)
+
+IllegalArgumentException:
+java.lang.IllegalArgumentException: Bad argument
+	at com.example.TestApp.doSomething(TestApp.java:20)
+	at com.example.TestApp.main(TestApp.java:11)
+
+RuntimeException:
+java.lang.RuntimeException: Top level error
+	at com.example.TestApp.run(TestApp.java:30)
+	at com.example.TestApp.main(TestApp.java:12)
