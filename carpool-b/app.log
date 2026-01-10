@@ -721,3 +721,443 @@
 2026-01-10T17:01:30.320+08:00  INFO 13708 --- [carpool] [http-nio-8080-exec-9] c.e.c.c.LogLevelCountController          : 尝试读取日志统计文件...
 2026-01-10T17:01:30.321+08:00  INFO 13708 --- [carpool] [http-nio-8080-exec-9] c.e.c.c.LogLevelCountController          : 找到日志统计文件: C:\Users\HS\Desktop\carpool\carpool-b\log_level_count.txt
 2026-01-10T17:01:30.331+08:00  INFO 13708 --- [carpool] [http-nio-8080-exec-9] c.e.c.c.LogLevelCountController          : 成功读取日志统计文件，内容长度: 1690
+2026-01-10T17:27:52.013+08:00  INFO 31996 --- [carpool] [restartedMain] com.example.carpool.CarpoolApplication   : Starting CarpoolApplication using Java 21.0.8 with PID 31996 (D:\projects\courses\data_acq\carpool\carpool-b\build\classes\java\main started by C1883 in D:\projects\courses\data_acq\carpool\carpool-b)
+2026-01-10T17:27:52.017+08:00 DEBUG 31996 --- [carpool] [restartedMain] com.example.carpool.CarpoolApplication   : Running with Spring Boot v3.5.7, Spring v6.2.12
+2026-01-10T17:27:52.019+08:00  INFO 31996 --- [carpool] [restartedMain] com.example.carpool.CarpoolApplication   : No active profile set, falling back to 1 default profile: "default"
+2026-01-10T17:27:52.135+08:00  INFO 31996 --- [carpool] [restartedMain] .e.DevToolsPropertyDefaultsPostProcessor : Devtools property defaults active! Set 'spring.devtools.add-properties' to 'false' to disable
+2026-01-10T17:27:52.136+08:00  INFO 31996 --- [carpool] [restartedMain] .e.DevToolsPropertyDefaultsPostProcessor : For additional web related logging consider setting the 'logging.level.web' property to 'DEBUG'
+2026-01-10T17:27:53.821+08:00  INFO 31996 --- [carpool] [restartedMain] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2026-01-10T17:27:54.025+08:00  INFO 31996 --- [carpool] [restartedMain] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 177 ms. Found 7 JPA repository interfaces.
+2026-01-10T17:27:55.700+08:00  INFO 31996 --- [carpool] [restartedMain] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat initialized with port 8080 (http)
+2026-01-10T17:27:55.741+08:00  INFO 31996 --- [carpool] [restartedMain] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2026-01-10T17:27:55.742+08:00  INFO 31996 --- [carpool] [restartedMain] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/10.1.48]
+2026-01-10T17:27:55.953+08:00  INFO 31996 --- [carpool] [restartedMain] o.a.c.c.C.[Tomcat].[localhost].[/api]    : Initializing Spring embedded WebApplicationContext
+2026-01-10T17:27:55.953+08:00  INFO 31996 --- [carpool] [restartedMain] w.s.c.ServletWebServerApplicationContext : Root WebApplicationContext: initialization completed in 3817 ms
+2026-01-10T17:27:56.357+08:00  INFO 31996 --- [carpool] [restartedMain] o.hibernate.jpa.internal.util.LogHelper  : HHH000204: Processing PersistenceUnitInfo [name: default]
+2026-01-10T17:27:56.508+08:00  INFO 31996 --- [carpool] [restartedMain] org.hibernate.Version                    : HHH000412: Hibernate ORM core version 6.6.33.Final
+2026-01-10T17:27:56.588+08:00  INFO 31996 --- [carpool] [restartedMain] o.h.c.internal.RegionFactoryInitiator    : HHH000026: Second-level cache disabled
+2026-01-10T17:27:57.337+08:00  INFO 31996 --- [carpool] [restartedMain] o.s.o.j.p.SpringPersistenceUnitInfo      : No LoadTimeWeaver setup: ignoring JPA class transformer
+2026-01-10T17:27:57.405+08:00  INFO 31996 --- [carpool] [restartedMain] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
+2026-01-10T17:27:57.777+08:00  INFO 31996 --- [carpool] [restartedMain] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Added connection com.mysql.cj.jdbc.ConnectionImpl@78e27ba1
+2026-01-10T17:27:57.784+08:00  INFO 31996 --- [carpool] [restartedMain] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
+2026-01-10T17:27:57.886+08:00  WARN 31996 --- [carpool] [restartedMain] org.hibernate.orm.deprecation            : HHH90000025: MySQL8Dialect does not need to be specified explicitly using 'hibernate.dialect' (remove the property setting and it will be selected by default)
+2026-01-10T17:27:57.889+08:00  WARN 31996 --- [carpool] [restartedMain] org.hibernate.orm.deprecation            : HHH90000026: MySQL8Dialect has been deprecated; use org.hibernate.dialect.MySQLDialect instead
+2026-01-10T17:27:57.927+08:00  INFO 31996 --- [carpool] [restartedMain] org.hibernate.orm.connections.pooling    : HHH10001005: Database info:
+	Database JDBC URL [Connecting through datasource 'HikariDataSource (HikariPool-1)']
+	Database driver: undefined/unknown
+	Database version: 8.0
+	Autocommit mode: undefined/unknown
+	Isolation level: undefined/unknown
+	Minimum pool size: undefined/unknown
+	Maximum pool size: undefined/unknown
+2026-01-10T17:28:00.163+08:00  INFO 31996 --- [carpool] [restartedMain] o.h.e.t.j.p.i.JtaPlatformInitiator       : HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2026-01-10T17:28:00.169+08:00  INFO 31996 --- [carpool] [restartedMain] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
+2026-01-10T17:28:00.964+08:00  INFO 31996 --- [carpool] [restartedMain] o.s.d.j.r.query.QueryEnhancerFactory     : Hibernate is in classpath; If applicable, HQL parser will be used.
+2026-01-10T17:28:07.797+08:00  WARN 31996 --- [carpool] [restartedMain] JpaBaseConfiguration$JpaWebConfiguration : spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2026-01-10T17:28:08.651+08:00  INFO 31996 --- [carpool] [restartedMain] o.s.b.d.a.OptionalLiveReloadServer       : LiveReload server is running on port 35729
+2026-01-10T17:28:08.737+08:00  INFO 31996 --- [carpool] [restartedMain] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat started on port 8080 (http) with context path '/api'
+2026-01-10T17:28:08.753+08:00  INFO 31996 --- [carpool] [restartedMain] com.example.carpool.CarpoolApplication   : Started CarpoolApplication in 17.886 seconds (process running for 19.386)
+2026-01-10T17:30:48.343+08:00  INFO 31996 --- [carpool] [http-nio-8080-exec-4] o.a.c.c.C.[Tomcat].[localhost].[/api]    : Initializing Spring DispatcherServlet 'dispatcherServlet'
+2026-01-10T17:30:48.344+08:00  INFO 31996 --- [carpool] [http-nio-8080-exec-4] o.s.web.servlet.DispatcherServlet        : Initializing Servlet 'dispatcherServlet'
+2026-01-10T17:30:48.346+08:00  INFO 31996 --- [carpool] [http-nio-8080-exec-4] o.s.web.servlet.DispatcherServlet        : Completed initialization in 1 ms
+2026-01-10T17:30:48.844+08:00 DEBUG 31996 --- [carpool] [http-nio-8080-exec-5] org.hibernate.SQL                        : 
+    select
+        u1_0.id,
+        u1_0.created_at,
+        u1_0.email,
+        u1_0.password,
+        u1_0.phone_number,
+        u1_0.real_name,
+        u1_0.status,
+        u1_0.updated_at,
+        u1_0.username 
+    from
+        users u1_0 
+    where
+        u1_0.id=?
+2026-01-10T17:30:50.944+08:00 DEBUG 31996 --- [carpool] [http-nio-8080-exec-7] org.hibernate.SQL                        : 
+    select
+        rto1_0.evaluation_status,
+        count(rto1_0.id) 
+    from
+        road_traffic_overall rto1_0 
+    where
+        rto1_0.request_time>=? 
+    group by
+        rto1_0.evaluation_status
+2026-01-10T17:30:50.944+08:00 DEBUG 31996 --- [carpool] [http-nio-8080-exec-6] org.hibernate.SQL                        : 
+    select
+        rto1_0.id,
+        rto1_0.api_status,
+        rto1_0.city,
+        rto1_0.created_at,
+        rto1_0.description,
+        rto1_0.evaluation_status,
+        rto1_0.evaluation_status_desc,
+        rto1_0.message,
+        rto1_0.request_time,
+        rto1_0.road_name 
+    from
+        road_traffic_overall rto1_0 
+    where
+        rto1_0.id in (select
+            max(rto2_0.id) 
+        from
+            road_traffic_overall rto2_0 
+        group by
+            rto2_0.road_name, rto2_0.city) 
+    order by
+        rto1_0.request_time desc,
+        rto1_0.request_time desc 
+    limit
+        ?
+2026-01-10T17:30:50.986+08:00 DEBUG 31996 --- [carpool] [http-nio-8080-exec-6] org.hibernate.SQL                        : 
+    select
+        count(rto1_0.id) 
+    from
+        road_traffic_overall rto1_0 
+    where
+        rto1_0.id in (select
+            max(rto2_0.id) 
+        from
+            road_traffic_overall rto2_0 
+        group by
+            rto2_0.road_name, rto2_0.city)
+2026-01-10T17:30:51.006+08:00  WARN 31996 --- [carpool] [http-nio-8080-exec-6] ration$PageModule$WarningLoggingModifier : Serializing PageImpl instances as-is is not supported, meaning that there is no guarantee about the stability of the resulting JSON structure!
+	For a stable JSON structure, please use Spring Data's PagedModel (globally via @EnableSpringDataWebSupport(pageSerializationMode = VIA_DTO))
+	or Spring HATEOAS and Spring Data's PagedResourcesAssembler as documented in https://docs.spring.io/spring-data/commons/reference/repositories/core-extensions.html#core.web.pageables.
+
+2026-01-10T17:30:52.125+08:00  INFO 31996 --- [carpool] [http-nio-8080-exec-9] c.e.c.c.LogLevelCountController          : 尝试读取日志统计文件...
+2026-01-10T17:30:52.127+08:00  INFO 31996 --- [carpool] [http-nio-8080-exec-9] c.e.c.c.LogLevelCountController          : 找到日志统计文件: D:\projects\courses\data_acq\carpool\carpool-b\log_level_count.txt
+2026-01-10T17:30:52.130+08:00  INFO 31996 --- [carpool] [http-nio-8080-exec-9] c.e.c.c.LogLevelCountController          : 成功读取日志统计文件，内容长度: 1741
+2026-01-10T17:30:53.257+08:00  INFO 31996 --- [carpool] [http-nio-8080-exec-10] c.e.c.c.LogLevelCountController          : 尝试读取日志统计文件...
+2026-01-10T17:30:53.259+08:00  INFO 31996 --- [carpool] [http-nio-8080-exec-10] c.e.c.c.LogLevelCountController          : 找到日志统计文件: D:\projects\courses\data_acq\carpool\carpool-b\log_level_count.txt
+2026-01-10T17:30:53.259+08:00  INFO 31996 --- [carpool] [http-nio-8080-exec-10] c.e.c.c.LogLevelCountController          : 成功读取日志统计文件，内容长度: 1740
+2026-01-10T17:30:54.274+08:00  INFO 31996 --- [carpool] [http-nio-8080-exec-1] c.e.c.c.LogLevelCountController          : 尝试读取日志统计文件...
+2026-01-10T17:30:54.274+08:00  INFO 31996 --- [carpool] [http-nio-8080-exec-1] c.e.c.c.LogLevelCountController          : 找到日志统计文件: D:\projects\courses\data_acq\carpool\carpool-b\log_level_count.txt
+2026-01-10T17:30:54.275+08:00  INFO 31996 --- [carpool] [http-nio-8080-exec-1] c.e.c.c.LogLevelCountController          : 成功读取日志统计文件，内容长度: 1740
+2026-01-10T17:30:55.257+08:00  INFO 31996 --- [carpool] [http-nio-8080-exec-2] c.e.c.c.LogLevelCountController          : 尝试读取日志统计文件...
+2026-01-10T17:30:55.258+08:00  INFO 31996 --- [carpool] [http-nio-8080-exec-2] c.e.c.c.LogLevelCountController          : 找到日志统计文件: D:\projects\courses\data_acq\carpool\carpool-b\log_level_count.txt
+2026-01-10T17:30:55.259+08:00  INFO 31996 --- [carpool] [http-nio-8080-exec-2] c.e.c.c.LogLevelCountController          : 成功读取日志统计文件，内容长度: 1740
+2026-01-10T17:30:56.297+08:00 DEBUG 31996 --- [carpool] [http-nio-8080-exec-4] org.hibernate.SQL                        : 
+    select
+        cr1_0.id,
+        cr1_0.created_at,
+        cr1_0.earliest_departure_time,
+        cr1_0.end_latitude,
+        cr1_0.end_location,
+        cr1_0.end_longitude,
+        cr1_0.has_car,
+        cr1_0.latest_departure_time,
+        cr1_0.max_passenger_count,
+        cr1_0.passenger_count,
+        cr1_0.phone_number,
+        cr1_0.start_latitude,
+        cr1_0.start_location,
+        cr1_0.start_longitude,
+        cr1_0.status_desc,
+        cr1_0.user_id 
+    from
+        carpool_request cr1_0
+2026-01-10T17:30:56.322+08:00 DEBUG 31996 --- [carpool] [http-nio-8080-exec-4] org.hibernate.SQL                        : 
+    select
+        ci1_0.id,
+        ci1_0.carpool_request_id,
+        ci1_0.created_at,
+        ci1_0.inviter_id,
+        ci1_0.message,
+        ci1_0.passenger_count,
+        ci1_0.status,
+        ci1_0.updated_at 
+    from
+        carpool_invitation ci1_0 
+    where
+        ci1_0.carpool_request_id=?
+2026-01-10T17:30:56.342+08:00 DEBUG 31996 --- [carpool] [http-nio-8080-exec-4] org.hibernate.SQL                        : 
+    select
+        u1_0.id,
+        u1_0.created_at,
+        u1_0.email,
+        u1_0.password,
+        u1_0.phone_number,
+        u1_0.real_name,
+        u1_0.status,
+        u1_0.updated_at,
+        u1_0.username 
+    from
+        users u1_0 
+    where
+        u1_0.id=?
+2026-01-10T17:30:56.351+08:00 DEBUG 31996 --- [carpool] [http-nio-8080-exec-4] org.hibernate.SQL                        : 
+    select
+        ci1_0.id,
+        ci1_0.carpool_request_id,
+        ci1_0.created_at,
+        ci1_0.inviter_id,
+        ci1_0.message,
+        ci1_0.passenger_count,
+        ci1_0.status,
+        ci1_0.updated_at 
+    from
+        carpool_invitation ci1_0 
+    where
+        ci1_0.carpool_request_id=?
+2026-01-10T17:30:57.522+08:00 DEBUG 31996 --- [carpool] [http-nio-8080-exec-7] org.hibernate.SQL                        : 
+    select
+        distinct mr1_0.trip_id 
+    from
+        match_record mr1_0 
+    where
+        mr1_0.user_id=?
+2026-01-10T17:30:57.540+08:00 DEBUG 31996 --- [carpool] [http-nio-8080-exec-7] org.hibernate.SQL                        : 
+    select
+        tr1_0.id,
+        tr1_0.created_at,
+        tr1_0.departure_at,
+        tr1_0.end_latitude,
+        tr1_0.end_location,
+        tr1_0.end_longitude,
+        tr1_0.match_at,
+        tr1_0.passenger_count,
+        tr1_0.start_latitude,
+        tr1_0.start_location,
+        tr1_0.start_longitude,
+        tr1_0.status_desc 
+    from
+        trip_record tr1_0 
+    where
+        tr1_0.id in (?, ?) 
+    order by
+        tr1_0.created_at desc
+2026-01-10T17:30:57.558+08:00 DEBUG 31996 --- [carpool] [http-nio-8080-exec-7] org.hibernate.SQL                        : 
+    select
+        mr1_0.id,
+        mr1_0.created_at,
+        mr1_0.request_id,
+        mr1_0.trip_id,
+        mr1_0.user_id 
+    from
+        match_record mr1_0 
+    where
+        mr1_0.trip_id=?
+2026-01-10T17:30:57.564+08:00 DEBUG 31996 --- [carpool] [http-nio-8080-exec-7] org.hibernate.SQL                        : 
+    select
+        mr1_0.id,
+        mr1_0.created_at,
+        mr1_0.request_id,
+        mr1_0.trip_id,
+        mr1_0.user_id 
+    from
+        match_record mr1_0 
+    where
+        mr1_0.trip_id=?
+2026-01-10T17:30:58.767+08:00 DEBUG 31996 --- [carpool] [http-nio-8080-exec-6] org.hibernate.SQL                        : 
+    select
+        cr1_0.id,
+        cr1_0.created_at,
+        cr1_0.earliest_departure_time,
+        cr1_0.end_latitude,
+        cr1_0.end_location,
+        cr1_0.end_longitude,
+        cr1_0.has_car,
+        cr1_0.latest_departure_time,
+        cr1_0.max_passenger_count,
+        cr1_0.passenger_count,
+        cr1_0.phone_number,
+        cr1_0.start_latitude,
+        cr1_0.start_location,
+        cr1_0.start_longitude,
+        cr1_0.status_desc,
+        cr1_0.user_id 
+    from
+        carpool_request cr1_0 
+    where
+        (
+            ? is null 
+            or cr1_0.status_desc=?
+        ) 
+        and (
+            ? is null 
+            or ? is null 
+            or (
+                (
+                    6371*acos((((cos(radians(?))*cos(radians(cr1_0.start_latitude)))*cos((radians(cr1_0.start_longitude)-radians(?))))+(sin(radians(?))*sin(radians(cr1_0.start_latitude)))))
+                )<=?
+            )
+        ) 
+        and (
+            ? is null 
+            or cr1_0.earliest_departure_time>=?
+        ) 
+        and (
+            ? is null 
+            or cr1_0.latest_departure_time<=?
+        )
+2026-01-10T17:30:58.781+08:00 DEBUG 31996 --- [carpool] [http-nio-8080-exec-6] org.hibernate.SQL                        : 
+    select
+        u1_0.id,
+        u1_0.created_at,
+        u1_0.email,
+        u1_0.password,
+        u1_0.phone_number,
+        u1_0.real_name,
+        u1_0.status,
+        u1_0.updated_at,
+        u1_0.username 
+    from
+        users u1_0 
+    where
+        u1_0.id=?
+2026-01-10T17:30:58.785+08:00 DEBUG 31996 --- [carpool] [http-nio-8080-exec-6] org.hibernate.SQL                        : 
+    select
+        u1_0.id,
+        u1_0.created_at,
+        u1_0.email,
+        u1_0.password,
+        u1_0.phone_number,
+        u1_0.real_name,
+        u1_0.status,
+        u1_0.updated_at,
+        u1_0.username 
+    from
+        users u1_0 
+    where
+        u1_0.id=?
+2026-01-10T17:30:59.597+08:00  INFO 31996 --- [carpool] [http-nio-8080-exec-8] c.e.c.controller.TrafficController       : 收到获取支持城市列表请求
+2026-01-10T17:30:59.603+08:00 DEBUG 31996 --- [carpool] [http-nio-8080-exec-8] org.hibernate.SQL                        : 
+    select
+        distinct rto1_0.city 
+    from
+        road_traffic_overall rto1_0 
+    order by
+        rto1_0.city
+2026-01-10T17:30:59.608+08:00  INFO 31996 --- [carpool] [http-nio-8080-exec-8] c.e.c.controller.TrafficController       : 查询成功 - 找到 1 个城市
+2026-01-10T17:30:59.609+08:00 DEBUG 31996 --- [carpool] [http-nio-8080-exec-8] c.e.c.controller.TrafficController       : 城市列表: [上海市]
+2026-01-10T17:30:59.625+08:00  INFO 31996 --- [carpool] [http-nio-8080-exec-9] c.e.c.controller.TrafficController       : 收到获取城市道路列表请求 - 城市: [上海市]
+2026-01-10T17:30:59.629+08:00 DEBUG 31996 --- [carpool] [http-nio-8080-exec-9] org.hibernate.SQL                        : 
+    select
+        distinct rto1_0.road_name 
+    from
+        road_traffic_overall rto1_0 
+    where
+        rto1_0.city=? 
+    order by
+        rto1_0.road_name
+2026-01-10T17:30:59.634+08:00  INFO 31996 --- [carpool] [http-nio-8080-exec-9] c.e.c.controller.TrafficController       : 查询成功 - 找到 12 条道路
+2026-01-10T17:31:00.220+08:00 DEBUG 31996 --- [carpool] [http-nio-8080-exec-10] org.hibernate.SQL                        : 
+    select
+        rto1_0.id,
+        rto1_0.api_status,
+        rto1_0.city,
+        rto1_0.created_at,
+        rto1_0.description,
+        rto1_0.evaluation_status,
+        rto1_0.evaluation_status_desc,
+        rto1_0.message,
+        rto1_0.request_time,
+        rto1_0.road_name 
+    from
+        road_traffic_overall rto1_0 
+    where
+        rto1_0.id in (select
+            max(rto2_0.id) 
+        from
+            road_traffic_overall rto2_0 
+        group by
+            rto2_0.road_name, rto2_0.city) 
+    order by
+        rto1_0.request_time desc,
+        rto1_0.request_time desc 
+    limit
+        ?
+2026-01-10T17:31:00.225+08:00 DEBUG 31996 --- [carpool] [http-nio-8080-exec-1] org.hibernate.SQL                        : 
+    select
+        rto1_0.evaluation_status,
+        count(rto1_0.id) 
+    from
+        road_traffic_overall rto1_0 
+    where
+        rto1_0.request_time>=? 
+    group by
+        rto1_0.evaluation_status
+2026-01-10T17:31:00.228+08:00 DEBUG 31996 --- [carpool] [http-nio-8080-exec-10] org.hibernate.SQL                        : 
+    select
+        count(rto1_0.id) 
+    from
+        road_traffic_overall rto1_0 
+    where
+        rto1_0.id in (select
+            max(rto2_0.id) 
+        from
+            road_traffic_overall rto2_0 
+        group by
+            rto2_0.road_name, rto2_0.city)
+2026-01-10T17:31:05.669+08:00 DEBUG 31996 --- [carpool] [http-nio-8080-exec-2] org.hibernate.SQL                        : 
+    select
+        rto1_0.id,
+        rto1_0.api_status,
+        rto1_0.city,
+        rto1_0.created_at,
+        rto1_0.description,
+        rto1_0.evaluation_status,
+        rto1_0.evaluation_status_desc,
+        rto1_0.message,
+        rto1_0.request_time,
+        rto1_0.road_name 
+    from
+        road_traffic_overall rto1_0 
+    where
+        rto1_0.id in (select
+            max(rto2_0.id) 
+        from
+            road_traffic_overall rto2_0 
+        group by
+            rto2_0.road_name, rto2_0.city) 
+    order by
+        rto1_0.request_time desc,
+        rto1_0.request_time desc 
+    limit
+        ?
+2026-01-10T17:31:05.675+08:00 DEBUG 31996 --- [carpool] [http-nio-8080-exec-3] org.hibernate.SQL                        : 
+    select
+        rto1_0.evaluation_status,
+        count(rto1_0.id) 
+    from
+        road_traffic_overall rto1_0 
+    where
+        rto1_0.request_time>=? 
+    group by
+        rto1_0.evaluation_status
+2026-01-10T17:31:05.676+08:00 DEBUG 31996 --- [carpool] [http-nio-8080-exec-2] org.hibernate.SQL                        : 
+    select
+        count(rto1_0.id) 
+    from
+        road_traffic_overall rto1_0 
+    where
+        rto1_0.id in (select
+            max(rto2_0.id) 
+        from
+            road_traffic_overall rto2_0 
+        group by
+            rto2_0.road_name, rto2_0.city)
+2026-01-10T17:31:06.216+08:00  INFO 31996 --- [carpool] [http-nio-8080-exec-4] c.e.c.controller.TrafficController       : 收到获取支持城市列表请求
+2026-01-10T17:31:06.219+08:00 DEBUG 31996 --- [carpool] [http-nio-8080-exec-4] org.hibernate.SQL                        : 
+    select
+        distinct rto1_0.city 
+    from
+        road_traffic_overall rto1_0 
+    order by
+        rto1_0.city
+2026-01-10T17:31:06.223+08:00  INFO 31996 --- [carpool] [http-nio-8080-exec-4] c.e.c.controller.TrafficController       : 查询成功 - 找到 1 个城市
+2026-01-10T17:31:06.223+08:00 DEBUG 31996 --- [carpool] [http-nio-8080-exec-4] c.e.c.controller.TrafficController       : 城市列表: [上海市]
+2026-01-10T17:31:06.237+08:00  INFO 31996 --- [carpool] [http-nio-8080-exec-5] c.e.c.controller.TrafficController       : 收到获取城市道路列表请求 - 城市: [上海市]
+2026-01-10T17:31:06.241+08:00 DEBUG 31996 --- [carpool] [http-nio-8080-exec-5] org.hibernate.SQL                        : 
+    select
+        distinct rto1_0.road_name 
+    from
+        road_traffic_overall rto1_0 
+    where
+        rto1_0.city=? 
+    order by
+        rto1_0.road_name
+2026-01-10T17:31:06.244+08:00  INFO 31996 --- [carpool] [http-nio-8080-exec-5] c.e.c.controller.TrafficController       : 查询成功 - 找到 12 条道路

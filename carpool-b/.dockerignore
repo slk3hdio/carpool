@@ -1,0 +1,42 @@
+# Gradle
+.gradle/
+build/
+!build/libs/
+gradle-app.setting
+!gradle/wrapper/gradle-wrapper.jar
+
+# IDE
+.idea/
+*.iml
+*.iws
+*.ipr
+.vscode/
+.settings/
+.classpath
+.project
+
+# Logs
+*.log
+logs/
+app.log
+log_level_count.*
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Git
+.git/
+.gitignore
+.gitattributes
+
+# Documentation
+README.md
+*.md
+
+# Test
+src/test/
+
+# Docker
+Dockerfile
+.dockerignore
